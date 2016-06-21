@@ -1,0 +1,5 @@
+v5.2.8
+- fixed waut for network - updates and library
+- New channels: megafiletube, animestream, animetubeita by Costaplus
+- Fixed some channels
+- Fixed some servers
