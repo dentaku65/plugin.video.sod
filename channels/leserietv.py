@@ -9,6 +9,7 @@ import re
 import sys
 import urlparse
 import urllib2
+import xbmc
 from core import config
 from core import logger
 from core import scrapertools
@@ -67,7 +68,6 @@ def mainlist(item):
     itemlist.append(Item(channel=__channel__,
                          action="search",
                          title="[COLOR orange]Cerca...[/COLOR][I](minimo 3 caratteri)[/I]",
-                         url="http://www.leserie.tv/index.php?do=search",
                          thumbnail="http://dc467.4shared.com/img/fEbJqOum/s7/13feaf0c8c0/Search",
                          fanart="http://www.kaushik.net/avinash/wp-content/uploads/2010/02/search_engine.png"))
 
@@ -227,10 +227,10 @@ def categorias(item):
 def search(item,texto):
     logger.info("[laserietv.py] " + item.url + " search " + texto)
     itemlist =[]
-
+    url = "http://www.leserie.tv/index.php?do=search"
     post = "do=search&subaction=search&search_start=0&full_search=0&result_from=1&story="+texto
     logger.debug(post)
-    data = scrapertools.cachePagePost(item.url, post=post)
+    data = scrapertools.cachePagePost(url, post=post)
 
     patron = '<div class="video-item-cover"[^<]+<a href="(.*?)">[^<]+<img src="(.*?)" alt="(.*?)">'
     matches = re.compile(patron, re.DOTALL).findall(data)
@@ -322,7 +322,7 @@ def episodi(item):
 
     for scrapedtitle,scrapedurl in matches:
         scrapedtitle = scrapedtitle.replace('_',"x")
-
+        xbmc.log(scrapedurl)
         itemlist.append(Item(channel=__channel__,
                              action="findvideos",
                              title=scrapedtitle,
