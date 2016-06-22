@@ -56,7 +56,7 @@ def mainlist(params,url,category):
                 except:
                     import xbmcgui
                     dialog = xbmcgui.Dialog()
-                    dialog.ok("No se puede conectar","No ha sido posible comprobar","si hay actualizaciones")
+                    dialog.ok("Impossibile connettersi","Non è stato possibile verificare","gli aggiornamenti")
                     logger.info("channelselector.mainlist Fallo al verificar la actualización")
                     pass
             else:
