@@ -884,11 +884,11 @@ def alert_no_puedes_ver_video(server,url,motivo):
     if server!="":
         advertencia = xbmcgui.Dialog()
         if "<br/>" in motivo:
-            resultado = advertencia.ok( "No puedes ver ese vídeo porque...",motivo.split("<br/>")[0],motivo.split("<br/>")[1],url)
+            resultado = advertencia.ok( "Non è possibile visualizzare questo video perché...",motivo.split("<br/>")[0],motivo.split("<br/>")[1],url)
         else:
-            resultado = advertencia.ok( "No puedes ver ese vídeo porque...",motivo,url)
+            resultado = advertencia.ok( "Non è possibile visualizzare questo video perché...",motivo,url)
     else:
-        resultado = advertencia.ok( "No puedes ver ese vídeo porque...","El servidor donde está alojado no está","soportado en streamondemand todavía",url)
+        resultado = advertencia.ok( "Non è possibile visualizzare questo video perché...","Il server che lo ospita non è","ancora supportato da StreamOnDemand",url)
         
 def set_infoLabels(listitem,plot):
     # Modificacion introducida por super_berny para añadir infoLabels al ListItem
