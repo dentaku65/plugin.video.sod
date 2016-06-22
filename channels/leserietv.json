@@ -1,7 +1,7 @@
 {
     "channel": {
         "id": "leserietv",
-        "name": "leserieTv",
+        "name": "LeserieTv",
         "active": true,
         "adult": false,
         "category": [
