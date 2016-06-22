@@ -22,7 +22,7 @@ __language__ = "IT"
 DEBUG = config.get_setting("debug")
 
 host = "http://cinemastreaming.net/"
-
+#"http://cinemastreaming.net/category/serietv/"
 
 def isGeneric():
     return True
@@ -34,6 +34,11 @@ def mainlist(item):
                      title="[COLOR azure]Ultimi Film Inseriti[/COLOR]",
                      action="peliculas",
                      url="%s/category/streaming/" % host,
+                     thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
+                Item(channel=__channel__,
+                     title="[COLOR azure]Serie TV[/COLOR]",
+                     action="peliculas",
+                     url="%s/category/serietv/" % host,
                      thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
                 Item(channel=__channel__,
                      title="[COLOR yellow]Cerca...[/COLOR]",
