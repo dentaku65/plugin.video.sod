@@ -1,23 +1,43 @@
-# streamondemand
+![alt tag](https://raw.githubusercontent.com/Zanzibar82/plugin.video.streamondemand/master/icon.png)
+# Stream On Demand
 
-## Classic python version
+Son of pelisalacarta:
 
-If you want to develop with streamondemand you can start doing it on this "main-classic" folder.
+italian STREAM ON DEMAND
 
-It contains the current development version, configured to work on the latest Kodi. What i do is to link this to my Kodi "addons" folder so i can modify code and test it on-the-fly.
+The downloadable zips in release page can be installed directly into Kodi.
+Removed adult options and channels.
 
-If you are using Mac OS X you can do this with these commands.
+Special thanks to forum users:
 
-cd 
-cd Library/Application\ Support/Kodi/addons/
-ln -s /Users/jesus/streamondemand/python/main-classic plugin.video.streamondemand
+Jesus (for pelisalacarta and his total support)
 
-If you are using Linux commands are
+robalo (for being a reliable master and a skilled a developer)
 
-cd 
-cd .kodi/addons
-ln -s /home/jesus/streamondemand/python/main-classic plugin.video.streamondemand
+dentaku65 (for being a vulcano of ideas and a hard worker, and sparring partner in months of sleepless nights)
 
-On Windows i leave it as exercise :)
+DrZ3r0 (for being our most skilled developer, author of many important servers' files and caring about
+        the most boring/complicated/necessary stuff)
 
-After that you will see that streamondemand is installed and ready in Kodi# plugin.video.sod
+Raùl (for his native "general search" function we found here
+      http://www.mimediacenter.info/foro/viewtopic.php?f=22&t=6654&p=24982#p24982 was very handy )
+
+Chryses (for initial, raw, idea about auto-updates)
+
+fenice82 (for editing the useful xml files for channels and for
+          adapting pelisalacarta-UI to Streamondemand-PureIta, https://github.com/Fenice82/plugin.video.streamondemand-pureita)
+
+orione7 (for keeping up the pureITA "side project")
+
+costaplus (keep up the good job!)
+
+my girlfriend and his brother for love and support.
+
+...and anyone else supporting the project with their effort. 
+
+The project is on this account of mine just by chance, I am by no means a skilled developer,
+but I do my best to support the project and the rising community around it since the very beginning.
+
+Keep in mind in case you fork: STREAM ON DEMAND HAS AN AUTO-UPDATE SYSTEM LINKED TO THIS REPO.
+
+Come and join us: http://www.mimediacenter.info/foro/viewforum.php?f=36 (netiquette first)

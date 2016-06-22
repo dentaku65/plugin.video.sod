@@ -1,19 +1,20 @@
 # -*- coding: iso-8859-1 -*-
 #------------------------------------------------------------
-# streamondemand
+# pelisalacarta
 # XBMC entry point
-# http://blog.tvalacarta.info/plugin-xbmc/streamondemand/
+# http://blog.tvalacarta.info/plugin-xbmc/pelisalacarta/
 #------------------------------------------------------------
 
 # Constants
 __plugin__  = "streamondemand"
-__author__  = "streamondemand"
-__url__     = "http://blog.tvalacarta.info/plugin-xbmc/streamondemand/"
-__date__ = "26/03/2015"
-__version__ = "4.0"
+__author__  = "iSOD"
+__url__     = "http://blog.tvalacarta.info/plugin-xbmc/pelisalacarta/"
+__date__ = "12/06/2016"
+__version__ = "5.2.8"
 
 import os
 import sys
+
 from core import config
 from core import logger
 
@@ -22,10 +23,6 @@ logger.info("streamondemand.default init...")
 librerias = xbmc.translatePath( os.path.join( config.get_runtime_path(), 'lib' ) )
 sys.path.append (librerias)
 
+# Runs xbmc launcher
 from platformcode import launcher
-
-if sys.argv[1] == "1":
-    # Esto solo se ejecuta la primera vez que entramos en el plugin
-    launcher.start()
-
 launcher.run()
