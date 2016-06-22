@@ -37,8 +37,8 @@ def mainlist(item):
 
     itemlist.append(Item(channel=__channel__, action="elenco", title="[COLOR yellow]Novità[/COLOR]"       , url=host                 , thumbnail=NovitaThumbnail, fanart=FilmFanart ))
     itemlist.append(Item(channel=__channel__, action="elenco", title="[COLOR azure]Film al Cinema[/COLOR]", url=host+"/genere/cinema", thumbnail=NovitaThumbnail, fanart=FilmFanart ))
-    itemlist.append(Item(channel=__channel__, action="genere", title="[COLOR azure]Genere[/COLOR]"       , url=host                 , thumbnail=GenereThumbnail, fanart=FilmFanart ))
-    itemlist.append(Item(channel=__channel__, action="search", title="[COLOR orange]Cerca..[/COLOR]"      ,url=host + "/?s="         , thumbnail=CercaThumbnail , fanart=FilmFanart))
+    itemlist.append(Item(channel=__channel__, action="genere", title="[COLOR azure]Genere[/COLOR]"       , url=host                  , thumbnail=GenereThumbnail, fanart=FilmFanart ))
+    itemlist.append(Item(channel=__channel__, action="search", title="[COLOR orange]Cerca..[/COLOR]"      ,                            thumbnail=CercaThumbnail , fanart=FilmFanart))
 
     return itemlist
 #===========================================================================================================================================
@@ -99,7 +99,8 @@ def elenco(item):
 def search(item,texto):
     log("search","init texto=["+ texto + "]")
     itemlist = []
-    url=item.url+texto+"&search=Cerca+un+film"
+    url = host + "/?s="
+    url=url+texto+"&search=Cerca+un+film"
 
     patron='class="bottom_line"></div>[^<]+<[^<]+<img.*?src="(.*?)"[^<]+</a>[^>]+<[^<]+<[^<]+<[^<]+<.*?class="movie_title"><a href="(.*?)">(.*?)</a>'
     for scrapedthumbnail,scrapedurl,scrapedtitle in scrapedSingle(url,'div id="movie_post_content">(.*?)</ul>',patron):
