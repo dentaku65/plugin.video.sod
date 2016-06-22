@@ -27,7 +27,7 @@ elif thumbnail_type=="2":
 
 ROOT_DIR = config.get_runtime_path()
 
-REMOTE_VERSION_FILE = "http://descargas.tvalacarta.info/"+config.PLUGIN_NAME+"-version.xml"
+REMOTE_VERSION_FILE = "https://raw.githubusercontent.com/Zanzibar82/plugin.video.streamondemand/master/version.xml"
 LOCAL_VERSION_FILE = os.path.join( ROOT_DIR , "version.xml" )
 LOCAL_FILE = os.path.join( ROOT_DIR , config.PLUGIN_NAME+"-" )
 
@@ -38,43 +38,43 @@ try:
     logger.info("streamondemand.core.updater get_system_platform="+config.get_system_platform())
     if config.get_platform()=="kodi-jarvis":
         import xbmc
-        REMOTE_FILE = "http://descargas.tvalacarta.info/"+config.PLUGIN_NAME+"-kodi-jarvis-"
+        REMOTE_FILE = "https://github.com/Zanzibar82/plugin.video.streamondemand/archive/master.zip"
         DESTINATION_FOLDER = xbmc.translatePath( "special://home/addons")
     elif config.get_platform()=="kodi-isengard":
         import xbmc
-        REMOTE_FILE = "http://descargas.tvalacarta.info/"+config.PLUGIN_NAME+"-kodi-isengard-"
+        REMOTE_FILE = "https://github.com/Zanzibar82/plugin.video.streamondemand/archive/master.zip"
         DESTINATION_FOLDER = xbmc.translatePath( "special://home/addons")
     elif config.get_platform()=="kodi-helix":
         import xbmc
-        REMOTE_FILE = "http://descargas.tvalacarta.info/"+config.PLUGIN_NAME+"-kodi-helix-"
+        REMOTE_FILE = "https://github.com/Zanzibar82/plugin.video.streamondemand/archive/master.zip"
         DESTINATION_FOLDER = xbmc.translatePath( "special://home/addons")
     elif config.get_platform()=="xbmc-eden":
         import xbmc
-        REMOTE_FILE = "http://descargas.tvalacarta.info/"+config.PLUGIN_NAME+"-xbmc-eden-"
+        REMOTE_FILE = "https://github.com/Zanzibar82/plugin.video.streamondemand/archive/master.zip"
         DESTINATION_FOLDER = xbmc.translatePath( "special://home/addons")
     elif config.get_platform()=="xbmc-frodo":
         import xbmc
-        REMOTE_FILE = "http://descargas.tvalacarta.info/"+config.PLUGIN_NAME+"-xbmc-frodo-"
+        REMOTE_FILE = "https://github.com/Zanzibar82/plugin.video.streamondemand/archive/master.zip"
         DESTINATION_FOLDER = xbmc.translatePath( "special://home/addons")
     elif config.get_platform()=="xbmc-gotham":
         import xbmc
-        REMOTE_FILE = "http://descargas.tvalacarta.info/"+config.PLUGIN_NAME+"-xbmc-gotham-"
+        REMOTE_FILE = "https://github.com/Zanzibar82/plugin.video.streamondemand/archive/master.zip"
         DESTINATION_FOLDER = xbmc.translatePath( "special://home/addons")
     elif config.get_platform()=="xbmc":
         import xbmc
-        REMOTE_FILE = "http://descargas.tvalacarta.info/"+config.PLUGIN_NAME+"-xbmc-plugin-"
+        REMOTE_FILE = "https://github.com/Zanzibar82/plugin.video.streamondemand/archive/master.zip"
         DESTINATION_FOLDER = xbmc.translatePath( "special://home/plugins/video")
     elif config.get_platform()=="wiimc":
-        REMOTE_FILE = "http://descargas.tvalacarta.info/"+config.PLUGIN_NAME+"-wiimc-"
+        REMOTE_FILE = "https://github.com/Zanzibar82/plugin.video.streamondemand/archive/master.zip"
         DESTINATION_FOLDER = os.path.join(config.get_runtime_path(),"..")
     elif config.get_platform()=="rss":
-        REMOTE_FILE = "http://descargas.tvalacarta.info/"+config.PLUGIN_NAME+"-rss-"
+        REMOTE_FILE = "https://github.com/Zanzibar82/plugin.video.streamondemand/archive/master.zip"
         DESTINATION_FOLDER = os.path.join(config.get_runtime_path(),"..")
 
 except:
     import xbmc
-    REMOTE_FILE = "http://descargas.tvalacarta.info/"+config.PLUGIN_NAME+"-xbmc-plugin-"
-    DESTINATION_FOLDER = xbmc.translatePath( os.path.join( ROOT_DIR , ".." ) )
+    REMOTE_FILE = "https://github.com/Zanzibar82/plugin.video.streamondemand/archive/master.zip"
+    DESTINATION_FOLDER = xbmc.translatePath("special://home/addons")
 
 def checkforupdates(plugin_mode=True):
     logger.info("streamondemand.core.updater checkforupdates")
@@ -171,19 +171,19 @@ def checkforupdates(plugin_mode=True):
             import xbmcgui
             thumbnail = IMAGES_PATH+"Crystal_Clear_action_info.png"
             logger.info("thumbnail="+thumbnail)
-            listitem = xbmcgui.ListItem( "Descargar version "+tag_publicada, thumbnailImage=thumbnail )
+            listitem = xbmcgui.ListItem( "Scarica la versione "+tag_publicada, thumbnailImage=thumbnail )
             itemurl = '%s?action=update&version=%s' % ( sys.argv[ 0 ] , tag_publicada )
             import xbmcplugin
             xbmcplugin.addDirectoryItem( handle = int(sys.argv[ 1 ]), url = itemurl , listitem=listitem, isFolder=True)
             
             # Avisa con un popup
             dialog = xbmcgui.Dialog()
-            dialog.ok("Versión "+tag_publicada+" disponible","Ya puedes descargar la nueva versión del plugin\ndesde el listado principal")
+            dialog.ok("Versione "+tag_publicada+" disponibile","E' possibile scaricare la nuova versione del plugin\nattraverso l'opzione nel menù principale.")
 
         else:
 
             import xbmcgui
-            yes_pressed = xbmcgui.Dialog().yesno( "Versión "+tag_publicada+" disponible" , "¿Quieres instalarla?" )
+            yes_pressed = xbmcgui.Dialog().yesno( "Versione "+tag_publicada+" disponibile" , "Installarla?" )
 
             if yes_pressed:
                 params = {"version":tag_publicada}
@@ -199,7 +199,7 @@ def checkforupdates(plugin_mode=True):
 def update(params):
     # Descarga el ZIP
     logger.info("streamondemand.core.updater update")
-    remotefilename = REMOTE_FILE+params.get("version")+".zip"
+    remotefilename = REMOTE_FILE
     localfilename = LOCAL_FILE+params.get("version")+".zip"
     logger.info("streamondemand.core.updater remotefilename=%s" % remotefilename)
     logger.info("streamondemand.core.updater localfilename=%s" % localfilename)
@@ -227,9 +227,7 @@ def update(params):
     logger.info("streamondemand.core.updater ...fichero borrado")
 
 def get_channel_remote_url(channel_name):
-
-    _remote_channel_url_ = "https://raw.githubusercontent.com/tvalacarta/streamondemand/master/python/main-classic/"
-
+    _remote_channel_url_ = "https://raw.githubusercontent.com/Zanzibar82/plugin.video.streamondemand/master/"
     if channel_name <> "channelselector":
         _remote_channel_url_+= "channels/"
 
