@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <version>
 	<name>channelselector</name>
-	<tag>43</tag>
-	<date>17/02/2015</date>
-	<changes>Añadidos nuevos canales</changes>
+	<tag>45</tag>
+	<date>22/06/2016</date>
+	<changes>New channelselector</changes>
 </version>

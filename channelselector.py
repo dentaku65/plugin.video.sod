@@ -228,19 +228,19 @@ def filterchannels(category,preferred_thumb=""):
 def get_thumbnail_path(preferred_thumb=""):
 
     WEB_PATH = ""
-    
+
     if preferred_thumb=="":
         thumbnail_type = config.get_setting("thumbnail_type")
         if thumbnail_type=="":
             thumbnail_type="2"
 
         if thumbnail_type=="0":
-            WEB_PATH = "http://media.tvalacarta.info/streamondemand/posters/"
+            WEB_PATH = "https://raw.githubusercontent.com/Zanzibar82/images/master/posters/"
         elif thumbnail_type=="1":
-            WEB_PATH = "http://media.tvalacarta.info/streamondemand/banners/"
+            WEB_PATH = "https://raw.githubusercontent.com/Zanzibar82/images/master/banners/"
         elif thumbnail_type=="2":
-            WEB_PATH = "http://media.tvalacarta.info/streamondemand/squares/"
+            WEB_PATH = "https://raw.githubusercontent.com/Zanzibar82/images/master/squares/"
     else:
-        WEB_PATH = "http://media.tvalacarta.info/streamondemand/"+preferred_thumb+"/"
+        WEB_PATH = "https://raw.githubusercontent.com/Zanzibar82/images/master/"+preferred_thumb+"/"
 
     return WEB_PATH
