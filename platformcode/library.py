@@ -108,9 +108,10 @@ def savelibrary(titulo="",url="",thumbnail="",server="",plot="",canal="",categor
                 os.mkdir(pathserie)
 
         #Limpiamos el titulo para usarlo como fichero
-        from  core import scrapertools
-        filename = scrapertools.get_season_and_episode(titulo)+".strm"
-        #filename=string.translate(titulo,allchars,deletechars)+".strm"
+        #from  core import scrapertools
+        #filename = scrapertools.get_season_and_episode(titulo)+".strm"
+        titulo = re.sub(r"\[^]]*\]", "", titulo)
+        filename=string.translate(titulo,allchars,deletechars)+".strm"
 
         fullfilename = os.path.join(pathserie,filename)
     else:    #Resto de categorias de momento en la raiz de library
