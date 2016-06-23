@@ -36,8 +36,8 @@ def mainlist(item):
 
     logger.info("[descargas.py] downloadpath=" + downloadpath)
 
-    itemlist.append( Item( channel="descargas", action="pendientes", title="Descargas pendientes"))
-    itemlist.append( Item( channel="descargas", action="errores", title="Descargas con error"))
+    itemlist.append( Item( channel="descargas", action="pendientes", title="Download in sospeso"))
+    itemlist.append( Item( channel="descargas", action="errores", title="Download con errori"))
 
     # Añade al listado de XBMC
     try:
