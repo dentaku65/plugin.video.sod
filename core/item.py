@@ -48,6 +48,8 @@ class Item(object):
         kwargs.setdefault("folder", True)           #Carpeta o vídeo
         kwargs.setdefault("server", "")      #Servidor que contiene el vídeo
         kwargs.setdefault("extra", "")              #Datos extra
+        kwargs.setdefault("extrameta", "")              #Datos extra
+        kwargs.setdefault("extracmd", "")              #Datos extra
         
         kwargs.setdefault("language", "")           #Idioma del contenido
         kwargs.setdefault("context", "")            #Items para el Menú Contextual
