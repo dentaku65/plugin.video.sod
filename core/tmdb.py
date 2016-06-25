@@ -58,8 +58,8 @@
 # --------------------------------------------------------------------------------------------------------------------------------------------
 import traceback
 import urllib2
-
 from core import logger
+from core.item import Item
 
 
 class Tmdb(object):
@@ -575,3 +575,64 @@ class Tmdb(object):
             "still_path"] else ""
 
         return ret_dic
+
+
+
+####################################################################################################
+#   for StreamOnDemand by costaplus
+#===================================================================================================
+def info(title,tipo):
+    logger.info("streamondemand.core.tmdb info")
+    try:
+        oTmdb = Tmdb(texto_buscado=title, tipo=tipo, include_adult="false", idioma_busqueda="it")
+        if oTmdb.total_results > 0:
+            infolabels = {"year": oTmdb.result["release_date"][:4],
+                          "genre": ", ".join(oTmdb.result["genres"]),
+                          "rating": float(oTmdb.result["vote_average"])}
+            fanart = oTmdb.get_backdrop()
+            poster = oTmdb.get_poster()
+            if oTmdb.get_sinopsis() != "":
+                infolabels['plot'] = oTmdb.get_sinopsis()
+            plot = {"infoLabels": infolabels}
+            return plot, fanart, poster
+    except:
+        plot = ""
+        fanart = ""
+        poster = ""
+        return plot, fanart, poster
+#----------------------------------------------------------------------------------------------------
+
+#====================================================================================================
+def infoSod(channel="",action="",title="",url="",thumbnail="",tipo="movie"):
+    '''
+    :param channel:  il canale chiamante
+    :param title:    il titolo effettivo della ricerca
+    :param action:   la funzione che ne riceve la chiamata
+    :param url:      l'url dell'item
+    :param thumbnail:il thumbnail
+    :return:         ritorna un'item completo esente da errori di codice
+    '''
+    logger.info("streamondemand.core.tmdb infoSod")
+    logger.info("channel=["+ channel +"], action=[" + action +"], title["+ title+"], url=["+ url +"], thumbnail=[" + thumbnail+ "], tipo=[" + tipo + "]")
+    try:
+        plot, fanart, poster = info(title,tipo)
+        item=(Item(channel=channel,
+                   thumbnail=poster,
+                   fanart=fanart if fanart != "" else poster,
+                   plot=str(plot),
+                   action = action,
+                   title = "[COLOR azure]" + title + "[/COLOR]",
+                   url = url,
+                   fulltitle = title,
+                   show = title,
+                   folder = True))
+    except:
+        item=(Item(channel=channel,
+                   action=action,
+                   title=title,
+                   url=url,
+                   thumbnail=thumbnail,
+                   fulltitle=title,
+                   show=title))
+    return item
+#===================================================================================================
