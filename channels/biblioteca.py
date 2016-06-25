@@ -10,6 +10,7 @@ import re
 import urllib
 from unicodedata import normalize
 
+
 import xbmc
 import xbmcgui
 import xbmcaddon
