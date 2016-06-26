@@ -99,7 +99,7 @@ def peliculas(item):
         scrapedthumbnail += "|" + _headers
         ## ------------------------------------------------
 
-        itemlist.append(infoSod(channel=__channel__, action="findvideos", title=scrapedtitle, url=scrapedurl,thumbnail=scrapedthumbnail, tipo="movie"))
+        itemlist.append(infoSod(channel=__channel__, action="findvid", title=scrapedtitle, url=scrapedurl,thumbnail=scrapedthumbnail, tipo="movie"))
 
     # Extrae el paginador
     patronvideos = 'class="nextpostslink" rel="next" href="([^"]+)">&raquo;'
