@@ -12,6 +12,7 @@ from core import config
 from core import scrapertools
 from core.item import Item
 from servers import servertools
+from core.tmdb import infoSod
 
 __channel__ = "corsaronero"
 __category__ = "F"
@@ -69,13 +70,15 @@ def peliculas(item):
         scrapedplot = ""
         scrapedthumbnail = ""
         if (DEBUG): logger.info("title=["+scrapedtitle+"], url=["+url+"], thumbnail=["+scrapedthumbnail+"]")
-        try:
-           plot, fanart, poster, extrameta = info(title)
 
-           itemlist.append( Item(channel=__channel__, action="play", fulltitle=scrapedtitle, show=scrapedtitle, title="[COLOR darkkhaki].torrent [/COLOR]""[COLOR azure]"+scrapedtitle+"[/COLOR]" , url=url , thumbnail=poster , plot=str(plot) , extrameta=extrameta , fanart=fanart if fanart != "" else poster, folder=True) )
-        except:
-           itemlist.append( Item(channel=__channel__, action="play", fulltitle=scrapedtitle, show=scrapedtitle, title="[COLOR darkkhaki].torrent [/COLOR]""[COLOR azure]"+scrapedtitle+"[/COLOR]" , url=url , thumbnail=scrapedthumbnail , plot=scrapedplot , folder=True) )
-
+        itemlist.append(infoSod(channel=__channel__,
+                                action="findvideos",
+                                title=title,
+                                titlein="[COLOR darkkhaki].torrent [/COLOR]""[COLOR azure]",
+                                titleend="[/COLOR]",
+                                url=url,
+                                thumbnail=scrapedthumbnail,
+                                tipo="movie"))
     # Extrae el paginador
     patronvideos  = '<a href="([^>"]+)">pagine successive'
     matches = re.compile(patronvideos,re.DOTALL).findall(data)
@@ -101,27 +104,4 @@ def play(item):
     itemlist.append( Item(channel=__channel__, action=play, server="torrent", title=item.title , url=link , thumbnail=item.thumbnail , plot=item.plot , folder=False) )
 
     return itemlist
-
-def info(title):
-    logger.info("streamondemand.corsaronero info")
-    try:
-        from core.tmdb import Tmdb
-        oTmdb= Tmdb(texto_buscado=title, tipo="movie", include_adult="false", idioma_busqueda="it")
-        count = 0
-        if oTmdb.total_results > 0:
-            #Mientras el thumbnail no coincida con el del resultado de la búsqueda, pasa al siguiente resultado
-            #while oTmdb.get_poster(size="w185") != thumbnail:
-                #count += 1
-                #oTmdb.load_resultado(index_resultado=count)
-                #if count == oTmdb.total_results : break
-           extrameta = {}
-           extrameta["Year"] = oTmdb.result["release_date"][:4]
-           extrameta["Genre"] = ", ".join(oTmdb.result["genres"])
-           extrameta["Rating"] = float(oTmdb.result["vote_average"])
-           fanart=oTmdb.get_backdrop()
-           poster=oTmdb.get_poster()
-           plot=oTmdb.get_sinopsis()
-           return plot, fanart, poster, extrameta
-    except:
-        pass	
 
