@@ -7,7 +7,7 @@
 #     from aadecode import decode as aadecode
 #     text_decode = aadecode(text_encode)
 # @robalo & @Cmos
-# http://blog.tvalacarta.info/plugin-xbmc/streamondemand/
+# http://blog.tvalacarta.info/plugin-xbmc/pelisalacarta/
 # ------------------------------------------------------------
 
 import re
@@ -70,3 +70,4 @@ def toString(number,base):
         return string[number]
     else:
         return toString(number//base,base) + string[number%base]
+

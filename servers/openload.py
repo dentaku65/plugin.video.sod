@@ -5,8 +5,6 @@
 # http://blog.tvalacarta.info/plugin-xbmc/pelisalacarta/
 # ------------------------------------------------------------
 
-# fixed by cmos
-
 import re
 
 from core import logger
@@ -17,50 +15,52 @@ headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:46.0) Gecko/20
 
 
 def test_video_exists(page_url):
-    logger.info("streamondemand.servers.openload test_video_exists(page_url='%s')" % page_url)
+    logger.info("stramondemand.servers.openload test_video_exists(page_url='%s')" % page_url)
 
     data = scrapertools.downloadpageWithoutCookies(page_url)
 
     if 'We are sorry!' in data:
-        return False, "[Openload] Il file è stato cancellato" 
+        return False, "[Openload] La risorsa non esiste o è stata eliminata" 
 
     return True, ""
 
 
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
-    logger.info("streamondemand.servers.openload url=" + page_url)
+    logger.info("stramondemand.servers.openload url=" + page_url)
     video_urls = []
 
     data = scrapertools.downloadpageWithoutCookies(page_url)
+
     subtitle = scrapertools.find_single_match(data, '<track kind="captions" src="([^"]+)" srclang="es"')
     #Header para la descarga
     header_down = "|User-Agent="+headers['User-Agent']+"|"
 
+    from aadecode import decode as aadecode
     if "videocontainer" not in data:
         url = page_url.replace("/embed/","/f/")
         data = scrapertools.downloadpageWithoutCookies(url)
         text_encode = scrapertools.find_single_match(data,"Click to start Download.*?<script[^>]+>(.*?)</script")
-        text_decode = decode(text_encode)
-
-        videourl = scrapertools.find_single_match(text_decode, '(http.*?)\}')
-        videourl = videourl.replace("https://","http://")
-        extension = videourl[-4:]
-        video_urls.append([ extension + " [Openload]", videourl+header_down+extension])
+        text_decode = aadecode(text_encode)
+        
+        videourl = scrapertools.find_single_match(text_decode, '(http.*?)\}').replace("https://","http://")
+        extension = scrapertools.find_single_match(data, '<meta name="description" content="([^"]+)"')
+        extension = "." + extension.rsplit(".", 1)[1]
+        video_urls.append([extension + " [Openload]", videourl+header_down+extension])
     else:
-        text_encode = scrapertools.find_multiple_matches(data,'<script type="text/javascript">(ﾟωﾟ.*?)</script>')
+        text_encode = scrapertools.find_multiple_matches(data,'<script[^>]+>(ﾟωﾟ.*?)</script>')
+        decodeindex = aadecode(text_encode[0])
+        subtract = scrapertools.find_single_match(decodeindex, 'welikekodi.*?(\([^;]+\))')
+        index = int(eval(subtract))
+        
         # Buscamos la variable que nos indica el script correcto
-        subtract = scrapertools.find_single_match(data, 'welikekodi_ya_rly = ([^;]+)')
-        index = eval(subtract)
-        text_decode = decode(text_encode[index])
-        videourl = scrapertools.find_single_match(text_decode, "(http.*?true)")
-     
-        videourl = scrapertools.get_header_from_response(videourl, header_to_get="location")
-        videourl = videourl.replace("https://","http://").replace("?mime=true","")
-        extension = videourl[-4:]
+        text_decode = aadecode(text_encode[index])
+
+        videourl = scrapertools.find_single_match(text_decode, "(http.*?true)").replace("https://","http://")
+        extension = "." + scrapertools.find_single_match(text_decode, "video/(\w+)")
         video_urls.append([extension + " [Openload] ", videourl+header_down+extension, 0, subtitle])
 
     for video_url in video_urls:
-        logger.info("streamondemand.servers.openload %s - %s" % (video_url[0],video_url[1]))
+        logger.info("stramondemand.servers.openload %s - %s" % (video_url[0],video_url[1]))
 
     return video_urls
 
@@ -71,7 +71,7 @@ def find_videos(text):
     devuelve = []
 
     patronvideos = '//(?:www.)?openload.../(?:embed|f)/([0-9a-zA-Z-_]+)'
-    logger.info("streamondemand.servers.openload find_videos #" + patronvideos + "#")
+    logger.info("stramondemand.servers.openload find_videos #" + patronvideos + "#")
 
     matches = re.compile(patronvideos, re.DOTALL).findall(text)
 
@@ -86,63 +86,4 @@ def find_videos(text):
             logger.info("  url duplicada=" + url)
 
     return devuelve
-
-
-def decode(text):
-    text = re.sub(r"\s+", "", text)
-    data = text.split("+(ﾟДﾟ)[ﾟoﾟ]")[1]
-    chars = data.split("+(ﾟДﾟ)[ﾟεﾟ]+")[1:]
-
-    txt = ""
-    for char in chars:
-        char = char \
-            .replace("(oﾟｰﾟo)","u") \
-            .replace("c", "0") \
-            .replace("(ﾟДﾟ)['0']", "c") \
-            .replace("ﾟΘﾟ", "1") \
-            .replace("!+[]", "1") \
-            .replace("-~", "1+") \
-            .replace("o", "3") \
-            .replace("_", "3") \
-            .replace("ﾟｰﾟ", "4") \
-            .replace("(+", "(")
-        char = re.sub(r'\((\d)\)', r'\1', char)
-        for x in scrapertools.find_multiple_matches(char,'(\(\d\+\d\))'):
-            char = char.replace( x, str(eval(x)) )
-        for x in scrapertools.find_multiple_matches(char,'(\(\d\^\d\^\d\))'):
-            char = char.replace( x, str(eval(x)) )
-        for x in scrapertools.find_multiple_matches(char,'(\(\d\+\d\+\d\))'):
-            char = char.replace( x, str(eval(x)) )
-        for x in scrapertools.find_multiple_matches(char,'(\(\d\+\d\))'):
-            char = char.replace( x, str(eval(x)) )
-        for x in scrapertools.find_multiple_matches(char,'(\(\d\-\d\))'):
-            char = char.replace( x, str(eval(x)) )
-        if 'u' not in char: txt+= char + "|"
-    txt = txt[:-1].replace('+','')
-    txt_result = "".join([ chr(int(n, 8)) for n in txt.split('|') ])
-    sum_base = ""
-    m3 = False
-    if ".toString(" in txt_result:
-        if "+(" in  txt_result:
-            m3 = True
-            sum_base = "+"+scrapertools.find_single_match(txt_result,".toString...(\d+).")
-            txt_pre_temp = scrapertools.find_multiple_matches(txt_result,"..(\d),(\d+).")
-            txt_temp = [ (n, b) for b ,n in txt_pre_temp ]
-        else:
-            txt_temp = scrapertools.find_multiple_matches(txt_result, '(\d+)\.0.\w+.([^\)]+).')
-        for numero, base in txt_temp:
-            code = toString( int(numero), eval(base+sum_base) )
-            if m3:
-                txt_result = re.sub( r'"|\+', '', txt_result.replace("("+base+","+numero+")", code) )
-            else:
-                txt_result = re.sub( r"'|\+", '', txt_result.replace(numero+".0.toString("+base+")", code) )
-    return txt_result
-
-
-def toString(number,base):
-   string = "0123456789abcdefghijklmnopqrstuvwxyz"
-   if number < base:
-      return string[number]
-   else:
-      return toString(number//base,base) + string[number%base]
 
