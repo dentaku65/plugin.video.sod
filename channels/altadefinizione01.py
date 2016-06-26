@@ -15,6 +15,8 @@ from core import logger
 from core import scrapertools
 from core.item import Item
 from servers import servertools
+from core.tmdb import infoSod
+
 
 __channel__ = "altadefinizione01"
 __category__ = "F,S,A"
@@ -96,34 +98,8 @@ def peliculas(item):
         ## ------------------------------------------------
         scrapedthumbnail += "|" + _headers
         ## ------------------------------------------------
-        tmdbtitle = scrapertools.decodeHtmlentities(scrapedtitle.replace("Sub ITA", ""))
-        try:
-           plot, fanart, poster, extrameta = info(tmdbtitle)
 
-           itemlist.append(
-               Item(channel=__channel__,
-                    thumbnail=poster,
-                    fanart=fanart if fanart != "" else poster,
-                    extrameta=extrameta,
-                    plot=str(plot),
-                    action="findvid",
-                    title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
-                    url=scrapedurl,
-                    fulltitle=scrapedtitle,
-                    show=scrapedtitle,
-                    folder=True))
-        except:
-           itemlist.append(
-               Item(channel=__channel__,
-                    action="findvid",
-                    title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
-                    fulltitle=scrapedtitle,
-                    show=scrapedtitle,
-                    url=scrapedurl,
-                    viewmode="movie_with_plot",
-                    thumbnail=scrapedthumbnail,
-                    plot=scrapedplot,
-                    folder=True))
+        itemlist.append(infoSod(channel=__channel__, action="findvideos", title=scrapedtitle, url=scrapedurl,thumbnail=scrapedthumbnail, tipo="movie"))
 
     # Extrae el paginador
     patronvideos = 'class="nextpostslink" rel="next" href="([^"]+)">&raquo;'
@@ -232,19 +208,4 @@ def anti_cloudflare(url):
 
     return scrapertools.cache_page(url, headers=headers)
 
-def info(title):
-    logger.info("streamondemand.altadefinizione01 info")
-    try:
-        from core.tmdb import Tmdb
-        oTmdb = Tmdb(texto_buscado=title, tipo="movie", include_adult="false", idioma_busqueda="it")
-        if oTmdb.total_results > 0:
-            extrameta = {"Year": oTmdb.result["release_date"][:4],
-                         "Genre": ", ".join(oTmdb.result["genres"]),
-                         "Rating": float(oTmdb.result["vote_average"])}
-            fanart = oTmdb.get_backdrop()
-            poster = oTmdb.get_poster()
-            plot = oTmdb.get_sinopsis()
-            return plot, fanart, poster, extrameta
-    except:
-        pass
 
