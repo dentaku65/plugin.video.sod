@@ -1,0 +1,27 @@
+
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<channel>
+	<id>chimerarevo</id>
+	<name>Chimerarevo</name>
+
+	<active>true</active>
+	<adult>false</adult>
+	<language>it</language>
+
+	<fanart></fanart>
+	<thumbnail>https://media.licdn.com/media/p/3/005/0a6/099/04a9505.png</thumbnail>
+	<bannermenu>https://media.licdn.com/media/p/3/005/0a6/099/04a9505.png</bannermenu>
+
+	<update_url>https://raw.githubusercontent.com/dentaku65/plugin.video.sod/master/channels/</update_url>
+	<version>1</version>
+	<date>22/06/2016</date>
+	<changes>update</changes>
+
+	<categories>
+		<category>documentary</category>
+	</categories>
+
+	<settings>
+		<include_in_global_search>true</include_in_global_search>
+	</settings>
+</channel>
