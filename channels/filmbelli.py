@@ -15,6 +15,7 @@ from core import logger
 from core import scrapertools
 from core.item import Item
 from servers import servertools
+from core.tmdb import infoSod
 
 
 __channel__ = "filmbelli"
@@ -65,21 +66,8 @@ def elenco(item):
     for scrapedthumbnail,scrapedurl,scrapedtitle in scrapedSingle(item.url,'div id="movie_post_content">(.*?)</ul>',patron):
         scrapedtitle=scrapertools.decodeHtmlentities(scrapedtitle)
         log("elenco","title=["+ scrapedtitle + "] url=["+ scrapedurl +"] thumbnail=["+ scrapedthumbnail +"]")
-        try:
-            plot, fanart, poster, extrameta = info(scrapedtitle)
-            itemlist.append(Item(channel=__channel__,
-                                 thumbnail=poster,
-                                 fanart=fanart if fanart != "" else poster,
-                                 extrameta=extrameta,
-                                 plot=str(plot),
-                                 action="findvideos",
-                                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
-                                 url=scrapedurl,
-                                 fulltitle=scrapedtitle,
-                                 show=scrapedtitle,
-                                 folder=True))
-        except:
-            itemlist.append(Item(channel=__channel__,action="findvideos",title=scrapedtitle,url=scrapedurl,thumbnail=scrapedthumbnail,fulltitle=scrapedtitle,show=scrapedtitle))
+
+        itemlist.append(infoSod(channel=__channel__, action="findvideos", title=scrapedtitle, url=scrapedurl,thumbnail=scrapedthumbnail, tipo="movie"))
 
     # Paginazione
     # ===========================================================================================================================
@@ -106,21 +94,8 @@ def search(item,texto):
     for scrapedthumbnail,scrapedurl,scrapedtitle in scrapedSingle(url,'div id="movie_post_content">(.*?)</ul>',patron):
         scrapedtitle=scrapertools.decodeHtmlentities(scrapedtitle)
         log("novita","title=["+ scrapedtitle + "] url=["+ scrapedurl +"] thumbnail=["+ scrapedthumbnail +"]")
-        try:
-            plot, fanart, poster, extrameta = info(scrapedtitle)
-            itemlist.append(Item(channel=__channel__,
-                                 thumbnail=poster,
-                                 fanart=fanart if fanart != "" else poster,
-                                 extrameta=extrameta,
-                                 plot=str(plot),
-                                 action="findvideos",
-                                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
-                                 url=scrapedurl,
-                                 fulltitle=scrapedtitle,
-                                 show=scrapedtitle,
-                                 folder=True))
-        except:
-            itemlist.append(Item(channel=__channel__,action="findvideos",title=scrapedtitle,url=scrapedurl,thumbnail=scrapedthumbnail,fulltitle=scrapedtitle,show=scrapedtitle))
+
+        itemlist.append(infoSod(channel=__channel__, action="findvideos", title=scrapedtitle, url=scrapedurl,thumbnail=scrapedthumbnail, tipo="movie"))
 
     # Paginazione
     # ===========================================================================================================================
@@ -151,7 +126,6 @@ def scrapedAll(url="",patron=""):
 def scrapedSingle(url="",single="",patron=""):
     matches =[]
     data = scrapertools.cache_page(url)
-    xbmc.log(data)
     elemento = scrapertools.find_single_match(data, single)
     log("scrapedSingle", "elemento:" + elemento)
     matches = re.compile(patron, re.DOTALL).findall(elemento)
@@ -162,34 +136,13 @@ def scrapedSingle(url="",single="",patron=""):
 
 #-----------------------------------------------------------------
 def log(funzione="",stringa="",canale=__channel__):
-       if DEBUG:logger.info("[" + canale + "].[" + funzione + "] " + stringa)
+       logger.info("[" + canale + "].[" + funzione + "] " + stringa)
 #=================================================================
 
 #-----------------------------------------------------------------
 def HomePage(item):
     xbmc.executebuiltin("ReplaceWindow(10024,plugin://plugin.video.streamondemand)")
 #=================================================================
-
-#-----------------------------------------------------------------
-def info(title):
-    log("info","title=["+ title +"]")
-    try:
-        from core.tmdb import Tmdb
-        oTmdb= Tmdb(texto_buscado=title, tipo= "movie", include_adult="false", idioma_busqueda="it")
-        count = 0
-        if oTmdb.total_results > 0:
-           extrameta = {}
-           extrameta["Year"] = oTmdb.result["release_date"][:4]
-           extrameta["Genre"] = ", ".join(oTmdb.result["genres"])
-           extrameta["Rating"] = float(oTmdb.result["vote_average"])
-           fanart=oTmdb.get_backdrop()
-           poster=oTmdb.get_poster()
-           plot=oTmdb.get_sinopsis()
-           return plot, fanart, poster, extrameta
-    except:
-        pass
-#=================================================================
-
 
 #=================================================================
 # riferimenti di servizio
@@ -204,4 +157,4 @@ ListTxt = "[COLOR orange]Torna a elenco principale [/COLOR]"
 AvantiTxt="[COLOR orange]Successivo>>[/COLOR]"
 AvantiImg="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png"
 thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"
-#----------------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------------------------------#----------------------------------------------------------------------------------------------------------------------------------
