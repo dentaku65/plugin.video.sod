@@ -603,7 +603,7 @@ def info(title,tipo):
 #----------------------------------------------------------------------------------------------------
 
 #====================================================================================================
-def infoSod(channel="",action="",title="",url="",thumbnail="",tipo="movie"):
+def infoSod(channel="",action="",title="",titlein="", titleend="",url="",thumbnail="",tipo="movie",):
     '''
     :param channel:  il canale chiamante
     :param title:    il titolo effettivo della ricerca
@@ -621,7 +621,7 @@ def infoSod(channel="",action="",title="",url="",thumbnail="",tipo="movie"):
                    fanart=fanart if fanart != "" else poster,
                    plot=str(plot),
                    action=action,
-                   title="[COLOR azure]" + title + "[/COLOR]",
+                   title=titlein + title + titleend,
                    url=url,
                    fulltitle=title,
                    show=title,
@@ -629,7 +629,7 @@ def infoSod(channel="",action="",title="",url="",thumbnail="",tipo="movie"):
     except:
         item=(Item(channel=channel,
                    action=action,
-                   title=title,
+                   title=titlein + title + titleend,
                    url=url,
                    thumbnail=thumbnail,
                    fulltitle=title,
