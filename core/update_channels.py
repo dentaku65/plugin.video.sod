@@ -4,13 +4,11 @@
 # update_servers.py
 # http://blog.tvalacarta.info/plugin-xbmc/pelisalacarta/
 # ------------------------------------------------------------
-
+import glob
 import os
-import re
 from threading import Thread
 
 from core import config
-from core import scrapertools
 from core import updater
 
 DEBUG = config.get_setting("debug")
@@ -19,9 +17,9 @@ DEBUG = config.get_setting("debug")
 ### Procedures
 def update_channels():
     channel_path = os.path.join(config.get_runtime_path(), "channels", '*.xml')
-    
+
     channel_files = glob.glob(channel_path)
-    
+
     # ----------------------------
     import xbmcgui
     progress = xbmcgui.DialogProgressBG()
@@ -41,6 +39,7 @@ def update_channels():
     # ----------------------------
     progress.close()
     # ----------------------------
+
 
 ### Run
 Thread(target=update_channels).start()
