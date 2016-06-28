@@ -5,7 +5,8 @@
         "active": true,
         "adult": false,
         "category": [
-                     "movie"
+                     "movie",
+                     "Top Channels"
                     ],
         "language": "it",
         "thumbnail": "https://raw.githubusercontent.com/Zanzibar82/images/master/posters/altadefinizione01.png",
