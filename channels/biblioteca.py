@@ -4,16 +4,12 @@
 # Ricerca "Biblioteca"
 # http://www.mimediacenter.info/foro/viewforum.php?f=36
 # ------------------------------------------------------------
-import base64
 import datetime
 import re
 import urllib
 from unicodedata import normalize
 
-
 import xbmc
-import xbmcgui
-import xbmcaddon
 
 from core import scrapertools
 
@@ -317,9 +313,9 @@ def search_person_by_name(item, search_terms):
                 fanart = tmdb_image(movie, 'backdrop_path', 'w1280')
                 break
 
-        extracmds = [
-            (NLS_Info_Person, "RunScript(script.extendedinfo,info=extendedactorinfo,id=%s)" % str(tmdb_tag(person, 'id')))] \
-            if xbmc.getCondVisibility('System.HasAddon(script.extendedinfo)') else []
+        # extracmds = [
+        #     (NLS_Info_Person, "RunScript(script.extendedinfo,info=extendedactorinfo,id=%s)" % str(tmdb_tag(person, 'id')))] \
+        #     if xbmc.getCondVisibility('System.HasAddon(script.extendedinfo)') else []
 
         itemlist.append(Item(
                 channel=item.channel,
@@ -329,7 +325,7 @@ def search_person_by_name(item, search_terms):
                 thumbnail=poster,
                 viewmode='list',
                 fanart=fanart,
-                extracmds=extracmds
+                # extracmds=extracmds
         ))
 
     return itemlist
@@ -410,15 +406,15 @@ def build_movie_list(item, movies):
         rating = tmdb_tag(movie, 'vote_average')
         votes = tmdb_tag(movie, 'vote_count')
 
-        extrameta = {}
+        extrameta = {'plot': plot}
         if year != "": extrameta["Year"] = year
         if genres != "": extrameta["Genre"] = genres
         if votes:
             extrameta["Rating"] = rating
             extrameta["Votes"] = "%d" % votes
 
-        extracmds = [(NLS_Info_Title, "RunScript(script.extendedinfo,info=extendedinfo,id=%s)" % str(tmdb_tag(movie, 'id')))] \
-            if xbmc.getCondVisibility('System.HasAddon(script.extendedinfo)') else [('Movie/Show Info', 'XBMC.Action(Info)')]
+        # extracmds = [(NLS_Info_Title, "RunScript(script.extendedinfo,info=extendedinfo,id=%s)" % str(tmdb_tag(movie, 'id')))] \
+        #     if xbmc.getCondVisibility('System.HasAddon(script.extendedinfo)') else [('Movie/Show Info', 'XBMC.Action(Info)')]
 
         found = False
         kodi_db_movies = kodi_database_movies(title)
@@ -443,11 +439,11 @@ def build_movie_list(item, movies):
                         title='[COLOR orange][%s][/COLOR] ' % NLS_Library + kodi_db_movie["title"] + jobrole,
                         thumbnail=poster,
                         category=genres,
-                        plot=plot,
+                        plot=str({"infoLabels": extrameta}),
                         viewmode='movie_with_plot',
                         fanart=fanart,
-                        extrameta=extrameta,
-                        extracmds=extracmds,
+                        # extrameta=extrameta,
+                        # extracmds=extracmds,
                         folder=False,
                 ))
 
@@ -460,11 +456,11 @@ def build_movie_list(item, movies):
                     title=title + jobrole,
                     thumbnail=poster,
                     category=genres,
-                    plot=plot,
+                    plot=str({"infoLabels": extrameta}),
                     viewmode='movie_with_plot',
                     fanart=fanart,
-                    extrameta=extrameta,
-                    extracmds=extracmds,
+                    # extrameta=extrameta,
+                    # extracmds=extracmds,
                     url=item.type
             ))
 
