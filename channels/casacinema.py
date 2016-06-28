@@ -247,7 +247,7 @@ def categorias(item):
     data = anti_cloudflare(item.url)
 
     # The categories are the options for the combo
-    patron = '<td[^<]+<a href="([^"]+)">[^>]+>([^<]+)</a>[^/]+/td>'
+    patron = '<div class="col-xs-6[^=]+="Categoria"[^>]+>[^=]+="(.*?)">(.*?)</a>'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 
