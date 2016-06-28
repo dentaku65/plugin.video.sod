@@ -5,14 +5,15 @@
 # http://blog.tvalacarta.info/plugin-xbmc/streamondemand.
 # ------------------------------------------------------------
 import re
-import urllib2
-import sys
 import time
+import urllib2
 import urlparse
+
 from core import config
 from core import logger
 from core import scrapertools
 from core.item import Item
+from core.tmdb import infoSod
 from servers import servertools
 
 __channel__ = "altadefinizioneclick"
@@ -194,33 +195,14 @@ def fichas(item):
         scrapedthumbnail += "|" + _headers
         # ------------------------------------------------
 
-        tmdbtitle1 = scrapedtitle.split("[")[0]
-        tmdbtitle = tmdbtitle1.split("(")[0]
-
-        try:
-           plot, fanart, poster, extrameta = info(tmdbtitle)
-
-           itemlist.append(
-               Item(channel=__channel__,
-                    thumbnail=poster,
-                    fanart=fanart if fanart != "" else poster,
-                    extrameta=extrameta,
-                    plot=str(plot),
-                    action="findvideos",
-                    title="[COLOR azure]" + title + "[/COLOR]",
-                    url=scrapedurl,
-                    fulltitle=title,
-                    show=scrapedtitle,
-                    folder=True))
-        except:
-           itemlist.append(
-               Item(channel=__channel__,
-                    action="findvideos",
-                    title=title,
-                    url=scrapedurl,
-                    thumbnail=scrapedthumbnail,
-                    fulltitle=title,
-                    show=scrapedtitle))
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action="findvideos",
+                 title="[COLOR azure]" + title + "[/COLOR]",
+                 url=scrapedurl,
+                 thumbnail=scrapedthumbnail,
+                 fulltitle=title,
+                 show=title), tipo='movie'))
 
     # Paginación
     next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)">')
@@ -326,20 +308,3 @@ def unescape(par1, par2, par3):
     var1 = re.sub("%26", "&", var1)
     var1 = re.sub("%3B", ";", var1)
     return var1.replace('<!--?--><?', '<!--?-->')
-
-def info(title):
-    logger.info("streamondemand.altadefinizioneclick info")
-    try:
-        from core.tmdb import Tmdb
-        oTmdb = Tmdb(texto_buscado=title, tipo="movie", include_adult="false", idioma_busqueda="it")
-        if oTmdb.total_results > 0:
-            extrameta = {"Year": oTmdb.result["release_date"][:4],
-                         "Genre": ", ".join(oTmdb.result["genres"]),
-                         "Rating": float(oTmdb.result["vote_average"])}
-            fanart = oTmdb.get_backdrop()
-            poster = oTmdb.get_poster()
-            plot = oTmdb.get_sinopsis()
-            return plot, fanart, poster, extrameta
-    except:
-        pass
-
