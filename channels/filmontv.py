@@ -88,7 +88,7 @@ def tvoggi(item):
         titolo = urllib.quote_plus(scrapedtitle)
         if (DEBUG): logger.info("title=[" + scrapedtitle + "], url=[" + scrapedurl + "]")
 
-        itemlist.append(infoSod(Item(channel=__channel__, action="do_search", title=scrapedtitle, url=scrapedurl, thumbnail=scrapedthumbnail), tipo="movie"))
+        itemlist.append(infoSod(Item(channel=__channel__, action="do_search", title=scrapedtitle, fulltitle=scrapedtitle, url=scrapedurl, thumbnail=scrapedthumbnail), tipo="movie"))
 
     return itemlist
 

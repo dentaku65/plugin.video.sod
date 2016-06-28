@@ -64,7 +64,7 @@ def elenco(item):
         scrapedtitle=scrapertools.decodeHtmlentities(scrapedtitle)
         log("elenco","title=["+ scrapedtitle + "] url=["+ scrapedurl +"] thumbnail=["+ scrapedthumbnail +"]")
 
-        itemlist.append(infoSod(Item(channel=__channel__, action="findvideos", title=scrapedtitle, url=scrapedurl,thumbnail=scrapedthumbnail), tipo="movie"))
+        itemlist.append(infoSod(Item(channel=__channel__, action="findvideos", title=scrapedtitle, fulltitle=scrapedtitle, url=scrapedurl,thumbnail=scrapedthumbnail), tipo="movie"))
 
     # Paginazione
     # ===========================================================================================================================
@@ -92,7 +92,7 @@ def search(item,texto):
         scrapedtitle=scrapertools.decodeHtmlentities(scrapedtitle)
         log("novita","title=["+ scrapedtitle + "] url=["+ scrapedurl +"] thumbnail=["+ scrapedthumbnail +"]")
 
-        itemlist.append(infoSod(Item(channel=__channel__, action="findvideos", title=scrapedtitle, url=scrapedurl, thumbnail=scrapedthumbnail), tipo="movie"))
+        itemlist.append(infoSod(Item(channel=__channel__, action="findvideos", title=scrapedtitle, fulltitle=scrapedtitle, url=scrapedurl, thumbnail=scrapedthumbnail), tipo="movie"))
 
     # Paginazione
     # ===========================================================================================================================
