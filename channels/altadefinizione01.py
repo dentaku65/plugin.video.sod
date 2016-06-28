@@ -5,7 +5,6 @@
 # http://www.mimediacenter.info/foro/viewforum.php?f=36
 # ------------------------------------------------------------
 import re
-import sys
 import time
 import urllib2
 import urlparse
@@ -14,9 +13,8 @@ from core import config
 from core import logger
 from core import scrapertools
 from core.item import Item
-from servers import servertools
 from core.tmdb import infoSod
-
+from servers import servertools
 
 __channel__ = "altadefinizione01"
 __category__ = "F,S,A"
@@ -99,7 +97,7 @@ def peliculas(item):
         scrapedthumbnail += "|" + _headers
         ## ------------------------------------------------
 
-        itemlist.append(infoSod(channel=__channel__, action="findvid", title=scrapedtitle, url=scrapedurl,thumbnail=scrapedthumbnail, tipo="movie"))
+        itemlist.append(infoSod(Item(channel=__channel__, action="findvid", title=scrapedtitle, url=scrapedurl, thumbnail=scrapedthumbnail), tipo="movie"))
 
     # Extrae el paginador
     patronvideos = 'class="nextpostslink" rel="next" href="([^"]+)">&raquo;'

@@ -6,17 +6,14 @@
 #  By Costaplus
 # ------------------------------------------------------------
 import re
-import sys
-import urlparse
-import urllib2
+
 import xbmc
+
 from core import config
 from core import logger
 from core import scrapertools
 from core.item import Item
-from servers import servertools
 from core.tmdb import infoSod
-
 
 __channel__ = "filmbelli"
 __category__ = "F"
@@ -67,7 +64,7 @@ def elenco(item):
         scrapedtitle=scrapertools.decodeHtmlentities(scrapedtitle)
         log("elenco","title=["+ scrapedtitle + "] url=["+ scrapedurl +"] thumbnail=["+ scrapedthumbnail +"]")
 
-        itemlist.append(infoSod(channel=__channel__, action="findvideos", title=scrapedtitle, url=scrapedurl,thumbnail=scrapedthumbnail, tipo="movie"))
+        itemlist.append(infoSod(Item(channel=__channel__, action="findvideos", title=scrapedtitle, url=scrapedurl,thumbnail=scrapedthumbnail), tipo="movie"))
 
     # Paginazione
     # ===========================================================================================================================
@@ -95,7 +92,7 @@ def search(item,texto):
         scrapedtitle=scrapertools.decodeHtmlentities(scrapedtitle)
         log("novita","title=["+ scrapedtitle + "] url=["+ scrapedurl +"] thumbnail=["+ scrapedthumbnail +"]")
 
-        itemlist.append(infoSod(channel=__channel__, action="findvideos", title=scrapedtitle, url=scrapedurl,thumbnail=scrapedthumbnail, tipo="movie"))
+        itemlist.append(infoSod(Item(channel=__channel__, action="findvideos", title=scrapedtitle, url=scrapedurl, thumbnail=scrapedthumbnail), tipo="movie"))
 
     # Paginazione
     # ===========================================================================================================================

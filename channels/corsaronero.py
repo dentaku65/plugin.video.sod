@@ -4,14 +4,14 @@
 # Canal para corsaronero
 # http://blog.tvalacarta.info/plugin-xbmc/streamondemand.
 #------------------------------------------------------------
-import urlparse,urllib2,urllib,re
-import os, sys
+import re
+import urllib
+import urlparse
 
-from core import logger
 from core import config
+from core import logger
 from core import scrapertools
 from core.item import Item
-from servers import servertools
 from core.tmdb import infoSod
 
 __channel__ = "corsaronero"
@@ -71,13 +71,12 @@ def peliculas(item):
         scrapedthumbnail = ""
         if (DEBUG): logger.info("title=["+scrapedtitle+"], url=["+url+"], thumbnail=["+scrapedthumbnail+"]")
 
-        itemlist.append(infoSod(channel=__channel__,
+        itemlist.append(infoSod(Item(channel=__channel__,
                                 action="findvideos",
-                                title=title,
-                                titlein="[COLOR darkkhaki].torrent [/COLOR]""[COLOR azure]",
-                                titleend="[/COLOR]",
+                                title="[COLOR darkkhaki].torrent [/COLOR][COLOR azure]" + title + "[/COLOR]",
+                                fulltitle=title,
                                 url=url,
-                                thumbnail=scrapedthumbnail,
+                                thumbnail=scrapedthumbnail),
                                 tipo="movie"))
     # Extrae el paginador
     patronvideos  = '<a href="([^>"]+)">pagine successive'

@@ -13,7 +13,6 @@ from core import scrapertools
 from core.item import Item
 from core.tmdb import infoSod
 
-
 __channel__ = "filmontv"
 __category__ = "F"
 __type__ = "generic"
@@ -89,7 +88,7 @@ def tvoggi(item):
         titolo = urllib.quote_plus(scrapedtitle)
         if (DEBUG): logger.info("title=[" + scrapedtitle + "], url=[" + scrapedurl + "]")
 
-        itemlist.append(infoSod(channel=__channel__, action="do_search", title=scrapedtitle, url=scrapedurl,thumbnail=scrapedthumbnail, tipo="movie"))
+        itemlist.append(infoSod(Item(channel=__channel__, action="do_search", title=scrapedtitle, url=scrapedurl, thumbnail=scrapedthumbnail), tipo="movie"))
 
     return itemlist
 

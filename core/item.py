@@ -22,10 +22,12 @@
 # along with streamondemand 4.  If not, see <http://www.gnu.org/licenses/>.
 #------------------------------------------------------------
 
-from core import jsontools as json
 import base64
-import urllib
 import copy
+import urllib
+
+from core import jsontools as json
+
 
 class Item(object):  
 
@@ -48,10 +50,7 @@ class Item(object):
         kwargs.setdefault("folder", True)           #Carpeta o vídeo
         kwargs.setdefault("server", "")      #Servidor que contiene el vídeo
         kwargs.setdefault("extra", "")              #Datos extra
-        kwargs.setdefault("extrameta", None)              #Datos extra
-        kwargs.setdefault("extracmd", None)              #Datos extra
-        kwargs.setdefault("type", "")              #Datos extra
-        
+
         kwargs.setdefault("language", "")           #Idioma del contenido
         kwargs.setdefault("context", "")            #Items para el Menú Contextual
         kwargs.setdefault("subtitle", "")           #Subtitulos
