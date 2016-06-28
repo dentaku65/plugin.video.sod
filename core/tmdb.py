@@ -58,8 +58,9 @@
 # --------------------------------------------------------------------------------------------------------------------------------------------
 import traceback
 import urllib2
+
 from core import logger
-from core.item import Item
+from core import scrapertools
 
 
 class Tmdb(object):
@@ -581,18 +582,17 @@ class Tmdb(object):
 ####################################################################################################
 #   for StreamOnDemand by costaplus
 #===================================================================================================
-def info(title,tipo):
+def info(title, year, tipo):
     logger.info("streamondemand.core.tmdb info")
     try:
-        oTmdb = Tmdb(texto_buscado=title, tipo=tipo, include_adult="false", idioma_busqueda="it")
+        oTmdb = Tmdb(texto_buscado=title, year=year, tipo=tipo, include_adult="false", idioma_busqueda="it")
         if oTmdb.total_results > 0:
             infolabels = {"year": oTmdb.result["release_date"][:4],
                           "genre": ", ".join(oTmdb.result["genres"]),
                           "rating": float(oTmdb.result["vote_average"])}
             fanart = oTmdb.get_backdrop()
             poster = oTmdb.get_poster()
-            if oTmdb.get_sinopsis() != "":
-                infolabels['plot'] = oTmdb.get_sinopsis()
+            infolabels['plot'] = oTmdb.get_sinopsis()
             plot = {"infoLabels": infolabels}
             return plot, fanart, poster
     except:
@@ -603,37 +603,25 @@ def info(title,tipo):
 #----------------------------------------------------------------------------------------------------
 
 #====================================================================================================
-def infoSod(channel="",action="",title="",titlein="", titleend="",url="",thumbnail="",tipo="movie",):
+def infoSod(item, tipo="movie", ):
     '''
-    :param channel:  il canale chiamante
-    :param title:    il titolo effettivo della ricerca
-    :param action:   la funzione che ne riceve la chiamata
-    :param url:      l'url dell'item
-    :param thumbnail:il thumbnail
-    :return:         ritorna un'item completo esente da errori di codice
+    :param item:  item
+    :return:      ritorna un'item completo esente da errori di codice
     '''
     logger.info("streamondemand.core.tmdb infoSod")
-    logger.info("channel=["+ channel +"], action=[" + action +"], title["+ title+"], url=["+ url +"], thumbnail=[" + thumbnail+ "], tipo=[" + tipo + "]")
+    logger.info("channel=[" + item.channel + "], action=[" + item.action + "], title[" + item.title + "], url=[" + item.url + "], thumbnail=[" + item.thumbnail + "], tipo=[" + tipo + "]")
     try:
-        plot, fanart, poster = info(title,tipo)
-        item=(Item(channel=channel,
-                   thumbnail=poster,
-                   fanart=fanart if fanart != "" else poster,
-                   plot=str(plot),
-                   action=action,
-                   title=titlein + title + titleend,
-                   url=url,
-                   fulltitle=title,
-                   show=title,
-                   folder=True))
+        tmdbtitle = item.fulltitle.split("[")[0].split("(")[0]
+        year = scrapertools.find_single_match(item.fulltitle, '\((\d{4})\)')
+
+        plot, fanart, poster = info(tmdbtitle, year, tipo)
+
+        item.fanart = fanart if fanart != "" else poster
+        if plot:
+            if not plot['infoLabels']['plot']:
+                plot['infoLabels']['plot'] = item.plot
+            item.plot = str(plot)
     except:
-        item=(Item(channel=channel,
-                   action=action,
-                   title=titlein + title + titleend,
-                   url=url,
-                   thumbnail=thumbnail,
-                   fulltitle=title,
-                   show=title,
-                   folder=True))
+        pass
     return item
-#===================================================================================================
+    #===================================================================================================
