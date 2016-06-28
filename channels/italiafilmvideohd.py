@@ -13,6 +13,7 @@ from core import config
 from core import logger
 from core import scrapertools
 from core.item import Item
+from core.tmdb import infoSod
 from servers import servertools
 
 __channel__ = "italiafilmvideohd"
@@ -134,7 +135,6 @@ def fichas(item):
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for scraped_2, scrapedtitle, scrapedthumbnail in matches:
-
         scrapedurl = scraped_2
 
         title = scrapertools.decodeHtmlentities(scrapedtitle)
@@ -143,31 +143,14 @@ def fichas(item):
         # ------------------------------------------------
         scrapedthumbnail += "|" + _headers
         # ------------------------------------------------
-
-        try:
-            plot, fanart, poster, extrameta = info(scrapedtitle)
-
-            itemlist.append(
-                Item(channel=__channel__,
-                     thumbnail=poster,
-                     fanart=fanart if fanart != "" else poster,
-                     extrameta=extrameta,
-                     plot=str(plot),
-                     action="findvideos",
-                     title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
-                     url=scrapedurl,
-                     fulltitle=title,
-                     show=scrapedtitle,
-                     folder=True))
-        except:
-            itemlist.append(
-                Item(channel=__channel__,
-                     action="findvideos",
-                     title=title,
-                     url=scrapedurl,
-                     thumbnail=scrapedthumbnail,
-                     fulltitle=title,
-                     show=scrapedtitle))
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action="findvideos",
+                 title=title,
+                 url=scrapedurl,
+                 thumbnail=scrapedthumbnail,
+                 fulltitle=title,
+                 show=scrapedtitle), tipo='movie'))
 
     # Paginación
     next_page = re.compile('<a href="(.+?)" class="single_page" title=".+?">', re.DOTALL).findall(data)
@@ -219,7 +202,7 @@ def findvideos(item):
                 get_data = '%s=%s&%s=%s&%s=%s&%s=%s' % (name1, val1, name2, val2, name4, val4, name5, val5)
             else:
                 get_data = '%s=%s&%s=%s&%s=%s&%s=%s&%s=%s' % (
-                name1, val1, name2, val2, name3, val3, name4, val4, name5, val5)
+                    name1, val1, name2, val2, name3, val3, name4, val4, name5, val5)
             tmp_data = scrapertools.cache_page('http://hdpass.xyz/film.php?' + get_data, headers=headers)
 
             patron = r'; eval\(unescape\("(.*?)",(\[".*?;"\]),(\[".*?\])\)\);'
@@ -285,20 +268,3 @@ def unescape(par1, par2, par3):
     var1 = re.sub("%26", "&", var1)
     var1 = re.sub("%3B", ";", var1)
     return var1.replace('<!--?--><?', '<!--?-->')
-
-
-def info(title):
-    logger.info("streamondemand.italiafilmvideohd info")
-    try:
-        from core.tmdb import Tmdb
-        oTmdb = Tmdb(texto_buscado=title, tipo="movie", include_adult="false", idioma_busqueda="it")
-        if oTmdb.total_results > 0:
-            extrameta = {"Year": oTmdb.result["release_date"][:4],
-                         "Genre": ", ".join(oTmdb.result["genres"]),
-                         "Rating": float(oTmdb.result["vote_average"])}
-            fanart = oTmdb.get_backdrop()
-            poster = oTmdb.get_poster()
-            plot = oTmdb.get_sinopsis()
-            return plot, fanart, poster, extrameta
-    except:
-        pass
