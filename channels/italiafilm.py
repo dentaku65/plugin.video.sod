@@ -11,6 +11,7 @@ from core import config
 from core import logger
 from core import scrapertools
 from core.item import Item
+from core.tmdb import infoSod
 from servers import servertools
 
 __channel__ = "italiafilm"
@@ -139,36 +140,17 @@ def peliculas(item):
 
         if (DEBUG): logger.info("title=[" + title + "], url=[" + url + "], thumbnail=[" + thumbnail + "]")
 
-        tmdbtitle1 = title.split("[")[0]
-        tmdbtitle = tmdbtitle1.split("(")[0]
-        year = scrapertools.find_single_match(title, '\((\d+)\)')
-        try:
-            plot, fanart, poster, extrameta = info(tmdbtitle, year)
-
-            itemlist.append(
-                Item(channel=__channel__,
-                     thumbnail=poster,
-                     fanart=fanart if fanart != "" else poster,
-                     extrameta=extrameta,
-                     plot=str(plot),
-                     action='episodios' if item.extra == 'serie' else 'findvideos',
-                     title="[COLOR azure]" + title + "[/COLOR]",
-                     url=url,
-                     fulltitle=title,
-                     show=title,
-                     folder=True))
-        except:
-            itemlist.append(
-                Item(channel=__channel__,
-                     action='episodios' if item.extra == 'serie' else 'findvideos',
-                     fulltitle=title,
-                     show=title,
-                     title="[COLOR azure]" + title + "[/COLOR]",
-                     url=url,
-                     thumbnail=thumbnail,
-                     plot=plot,
-                     viewmode="movie_with_plot",
-                     folder=True))
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action='episodios' if item.extra == 'serie' else 'findvideos',
+                 fulltitle=title,
+                 show=title,
+                 title="[COLOR azure]" + title + "[/COLOR]",
+                 url=url,
+                 thumbnail=thumbnail,
+                 plot=plot,
+                 viewmode="movie_with_plot",
+                 folder=True), tipo='movie'))
 
     # Siguiente
     try:
@@ -210,35 +192,17 @@ def peliculas_tv(item):
 
         if (DEBUG): logger.info("title=[" + title + "], url=[" + url + "], thumbnail=[" + thumbnail + "]")
 
-        tmdbtitle1 = title.split("[")[0]
-        tmdbtitle = tmdbtitle1.split("(")[0]
-        try:
-            plot, fanart, poster, extrameta = info_tv(tmdbtitle)
-
-            itemlist.append(
-                Item(channel=__channel__,
-                     thumbnail=poster,
-                     fanart=fanart if fanart != "" else poster,
-                     extrameta=extrameta,
-                     plot=str(plot),
-                     action='episodios' if item.extra == 'serie' else 'findvideos',
-                     title="[COLOR azure]" + title + "[/COLOR]",
-                     url=url,
-                     fulltitle=title,
-                     show=title,
-                     folder=True))
-        except:
-            itemlist.append(
-                Item(channel=__channel__,
-                     action='episodios' if item.extra == 'serie' else 'findvideos',
-                     fulltitle=title,
-                     show=title,
-                     title="[COLOR azure]" + title + "[/COLOR]",
-                     url=url,
-                     thumbnail=thumbnail,
-                     plot=plot,
-                     viewmode="movie_with_plot",
-                     folder=True))
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action='episodios' if item.extra == 'serie' else 'findvideos',
+                 fulltitle=title,
+                 show=title,
+                 title="[COLOR azure]" + title + "[/COLOR]",
+                 url=url,
+                 thumbnail=thumbnail,
+                 plot=plot,
+                 viewmode="movie_with_plot",
+                 folder=True), tipo='tv'))
 
     # Siguiente
     try:
@@ -311,7 +275,7 @@ def episodios(item):
     matches = re.compile(patron, re.IGNORECASE).finditer(data)
     for match in matches:
         season_title = match.group()
-#        if season_title != '':
+        # if season_title != '':
         lang_titles.append('SUB ITA' if 'SUB' in season_title.upper() else 'ITA')
         starts.append(match.end())
 
@@ -359,7 +323,8 @@ def findvideos(item):
 
     itemlist = servertools.find_video_items(data=data)
 
-    url = scrapertools.find_single_match(data, '<iframe style="border: 0;" src="([^"]+)" width="[^"]*" height="[^"]*" scrolling="[^"]*" allowfullscreen="[^"]*"></iframe>')
+    patron = '<iframe style="border: 0;" src="([^"]+)" width="[^"]*" height="[^"]*" scrolling="[^"]*" allowfullscreen="[^"]*"></iframe>'
+    url = scrapertools.find_single_match(data, patron)
     if url:
         headers.append(['Referer', item.url])
         data = scrapertools.cache_page(url, headers=headers)
@@ -403,37 +368,3 @@ def findvid_serie(item):
         videoitem.channel = __channel__
 
     return itemlist
-
-
-def info(title, year):
-    logger.info("streamondemand.italiafilm info")
-    try:
-        from core.tmdb import Tmdb
-        oTmdb = Tmdb(texto_buscado=title, year=year, tipo="movie", include_adult="false", idioma_busqueda="it")
-        if oTmdb.total_results > 0:
-            extrameta = {"Year": oTmdb.result["release_date"][:4],
-                         "Genre": ", ".join(oTmdb.result["genres"]),
-                         "Rating": float(oTmdb.result["vote_average"])}
-            fanart = oTmdb.get_backdrop()
-            poster = oTmdb.get_poster()
-            plot = oTmdb.get_sinopsis()
-            return plot, fanart, poster, extrameta
-    except:
-        pass
-
-
-def info_tv(title):
-    logger.info("streamondemand.italiafilm info")
-    try:
-        from core.tmdb import Tmdb
-        oTmdb = Tmdb(texto_buscado=title, tipo="tv", include_adult="false", idioma_busqueda="it")
-        if oTmdb.total_results > 0:
-            extrameta = {"Year": oTmdb.result["release_date"][:4],
-                         "Genre": ", ".join(oTmdb.result["genres"]),
-                         "Rating": float(oTmdb.result["vote_average"])}
-            fanart = oTmdb.get_backdrop()
-            poster = oTmdb.get_poster()
-            plot = oTmdb.get_sinopsis()
-            return plot, fanart, poster, extrameta
-    except:
-        pass
