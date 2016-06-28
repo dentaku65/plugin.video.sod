@@ -5,16 +5,14 @@
 # http://blog.tvalacarta.info/plugin-xbmc/streamondemand.
 # ------------------------------------------------------------
 import re
-import sys
 import time
 import urllib2
 import urlparse
 
 from core import logger
-from core import config
 from core import scrapertools
-from servers import servertools
 from core.item import Item
+from core.tmdb import infoSod
 
 __channel__ = "casacinema"
 __category__ = "F,S,A"
@@ -30,8 +28,9 @@ headers = [
     ['Referer', 'http://www.casa-cinema.org/genere/serie-tv'],
     ['Connection', 'keep-alive']
 
-
 ]
+
+
 def isGeneric():
     return True
 
@@ -119,51 +118,35 @@ def peliculas(item):
         scrapedplot = html[start:end]
         scrapedplot = re.sub(r'<[^>]*>', '', scrapedplot)
         scrapedplot = scrapertools.decodeHtmlentities(scrapedplot).strip()
-        tmdbtitle = title.split("[")[0]
-        try:
-           plot, fanart, poster, extrameta = info(tmdbtitle)
-
-           itemlist.append(
-               Item(channel=__channel__,
-                    thumbnail=poster,
-                    fanart=fanart if fanart != "" else poster,
-                    extrameta=extrameta,
-                    plot=str(plot),
-                    action="episodios" if item.extra == "serie" else "findvideos",
-                    title=title,
-                    url=scrapedurl,
-                    fulltitle=title,
-                    show=title,
-                    folder=True))
-        except:
-           itemlist.append(
-               Item(channel=__channel__,
-                    action="episodios" if item.extra == "serie" else "findvideos",
-                    title=title,
-                    url=scrapedurl,
-                    thumbnail=scrapedthumbnail,
-                    fulltitle=title,
-                    show=title,
-                    plot=scrapedplot,
-                    folder=True))
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action="episodios" if item.extra == "serie" else "findvideos",
+                 title=title,
+                 url=scrapedurl,
+                 thumbnail=scrapedthumbnail,
+                 fulltitle=title,
+                 show=title,
+                 plot=scrapedplot,
+                 folder=True), tipo='movie'))
 
     ## Paginación
     next_page = scrapertools.find_single_match(data, 'rel="next" href="([^"]+)"')
 
     if next_page != "":
         itemlist.append(
-                Item(channel=__channel__,
-                     action="HomePage",
-                     title="[COLOR yellow]Torna Home[/COLOR]",
-                     folder=True)),
+            Item(channel=__channel__,
+                 action="HomePage",
+                 title="[COLOR yellow]Torna Home[/COLOR]",
+                 folder=True)),
         itemlist.append(
-                Item(channel=__channel__,
-                     action="peliculas",
-                     title="[COLOR orange]Successivo >>[/COLOR]",
-                     url=next_page,
-                     thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png"))
+            Item(channel=__channel__,
+                 action="peliculas",
+                 title="[COLOR orange]Successivo >>[/COLOR]",
+                 url=next_page,
+                 thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png"))
 
     return itemlist
+
 
 def peliculas_tv(item):
     logger.info("streamondemand.casacinema peliculas")
@@ -187,49 +170,32 @@ def peliculas_tv(item):
         scrapedplot = html[start:end]
         scrapedplot = re.sub(r'<[^>]*>', '', scrapedplot)
         scrapedplot = scrapertools.decodeHtmlentities(scrapedplot).strip()
-        tmdbtitle = title.split("Serie")[0]
-        try:
-           plot, fanart, poster, extrameta = info_tv(tmdbtitle)
-
-           itemlist.append(
-               Item(channel=__channel__,
-                    thumbnail=poster,
-                    fanart=fanart if fanart != "" else poster,
-                    extrameta=extrameta,
-                    plot=str(plot),
-                    action="episodios" if item.extra == "serie" else "findvideos",
-                    title=title,
-                    url=scrapedurl,
-                    fulltitle=title,
-                    show=title,
-                    folder=True))
-        except:
-           itemlist.append(
-               Item(channel=__channel__,
-                    action="episodios" if item.extra == "serie" else "findvideos",
-                    title=title,
-                    url=scrapedurl,
-                    thumbnail=scrapedthumbnail,
-                    fulltitle=title,
-                    show=title,
-                    plot=scrapedplot,
-                    folder=True))
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action="episodios" if item.extra == "serie" else "findvideos",
+                 title=title,
+                 url=scrapedurl,
+                 thumbnail=scrapedthumbnail,
+                 fulltitle=title,
+                 show=title,
+                 plot=scrapedplot,
+                 folder=True), tipo='tv'))
 
     ## Paginación
     next_page = scrapertools.find_single_match(data, 'rel="next" href="([^"]+)"')
 
     if next_page != "":
         itemlist.append(
-                Item(channel=__channel__,
-                     action="HomePage",
-                     title="[COLOR yellow]Torna Home[/COLOR]",
-                     folder=True)),
+            Item(channel=__channel__,
+                 action="HomePage",
+                 title="[COLOR yellow]Torna Home[/COLOR]",
+                 folder=True)),
         itemlist.append(
-                Item(channel=__channel__,
-                     action="peliculas_tv",
-                     title="[COLOR orange]Successivo >>[/COLOR]",
-                     url=next_page,
-                     thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png"))
+            Item(channel=__channel__,
+                 action="peliculas_tv",
+                 title="[COLOR orange]Successivo >>[/COLOR]",
+                 url=next_page,
+                 thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png"))
 
     return itemlist
 
@@ -253,48 +219,13 @@ def categorias(item):
 
     for scrapedurl, scrapedtitle in matches:
         itemlist.append(
-                Item(channel=__channel__,
-                     action="peliculas",
-                     title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
-                     url=urlparse.urljoin(host, scrapedurl)))
+            Item(channel=__channel__,
+                 action="peliculas",
+                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
+                 url=urlparse.urljoin(host, scrapedurl)))
 
     return itemlist
 
-def info(title):
-    logger.info("streamondemand.casacinema info")
-    try:
-        from core.tmdb import Tmdb
-        oTmdb= Tmdb(texto_buscado=title, tipo= "movie", include_adult="false", idioma_busqueda="it")
-        count = 0
-        if oTmdb.total_results > 0:
-           extrameta = {}
-           extrameta["Year"] = oTmdb.result["release_date"][:4]
-           extrameta["Genre"] = ", ".join(oTmdb.result["genres"])
-           extrameta["Rating"] = float(oTmdb.result["vote_average"])
-           fanart=oTmdb.get_backdrop()
-           poster=oTmdb.get_poster()
-           plot=oTmdb.get_sinopsis()
-           return plot, fanart, poster, extrameta
-    except:
-        pass	
-
-def info_tv(title):
-    logger.info("streamondemand.casacinema info")
-    try:
-        from core.tmdb import Tmdb
-        oTmdb= Tmdb(texto_buscado=title, tipo= "tv", include_adult="false", idioma_busqueda="it")
-        count = 0
-        if oTmdb.total_results > 0:
-           extrameta = {}
-           extrameta["Year"] = oTmdb.result["release_date"][:4]
-           extrameta["Genre"] = ", ".join(oTmdb.result["genres"])
-           extrameta["Rating"] = float(oTmdb.result["vote_average"])
-           fanart=oTmdb.get_backdrop()
-           poster=oTmdb.get_poster()
-           plot=oTmdb.get_sinopsis()
-           return plot, fanart, poster, extrameta
-    except:
-        pass	
 
 def episodios(item):
     logger.info("anime sub ita - episodianime")
@@ -316,26 +247,27 @@ def episodios(item):
         itemlist.append(
             Item(channel=__channel__,
                  action="find_video_items",
-                 title="[COLOR red]"+scrapedtitle+" [/COLOR]"+"[COLOR azure]"+item.fulltitle+" [/COLOR]"+"[COLOR orange] ["+scrapedserver+"][/COLOR]",
+                 title="[COLOR red]" + scrapedtitle + " [/COLOR]" + "[COLOR azure]" + item.fulltitle + " [/COLOR]" + "[COLOR orange] [" + scrapedserver + "][/COLOR]",
                  url=scrapedurl,
-                 #data=scrapedurl,
+                 # data=scrapedurl,
                  thumbnail=item.thumbnail,
                  fulltitle=item.fulltitle,
                  show=item.show))
 
     return itemlist
 
+
 def find_video_items(item=None, data=None, channel=""):
     logger.info("[launcher.py] findvideos")
 
-    data=item.url
+    data = item.url
 
     # Descarga la página
     if data is None:
         from core import scrapertools
         data = scrapertools.cache_page(item.url)
-        #logger.info(data)
-    
+        # logger.info(data)
+
     # Busca los enlaces a los videos
     from core.item import Item
     from servers import servertools
@@ -349,10 +281,13 @@ def find_video_items(item=None, data=None, channel=""):
         scrapedtitle = item.title.strip() + " - " + video[0].strip()
         scrapedurl = video[1]
         server = video[2]
-        
-        itemlist.append( Item(channel=item.channel, title=item.title , action="play" , server=server, page=item.page, url=scrapedurl, thumbnail=item.thumbnail, show=item.show , plot=item.plot , folder=False) )
+
+        itemlist.append(
+            Item(channel=item.channel, title=item.title, action="play", server=server, page=item.page, url=scrapedurl,
+                 thumbnail=item.thumbnail, show=item.show, plot=item.plot, folder=False))
 
     return itemlist
+
 
 def anti_cloudflare(url):
     # global headers
@@ -372,4 +307,3 @@ def anti_cloudflare(url):
         scrapertools.get_headers_from_response(s + '://' + h + "/" + resp_headers['refresh'][7:], headers=headers)
 
     return scrapertools.cache_page(url, headers=headers)
-
