@@ -23,7 +23,7 @@ def getmainlist(preferred_thumb=""):
 
     # Añade los canales que forman el menú principal
 
-    itemlist.append( Item( title=config.get_localized_string(30121) , channel="channelselector" , action="channeltypes" , thumbnail=urlparse.urljoin(get_thumbnail_path(preferred_thumb),"thumb_canales_todos.png"),viewmode="movie") )
+    #itemlist.append( Item( title=config.get_localized_string(30121) , channel="channelselector" , action="channeltypes" , thumbnail=urlparse.urljoin(get_thumbnail_path(preferred_thumb),"thumb_canales_todos.png"),viewmode="movie") )
     itemlist.append( Item(title=config.get_localized_string(30119) , channel="channelselector" , action="channeltypes", thumbnail = urlparse.urljoin(get_thumbnail_path(preferred_thumb),"thumb_canales.png"),viewmode="movie") )
     #itemlist.append( Item(title=config.get_localized_string(30130) , channel="novedades" , action="mainlist", thumbnail = urlparse.urljoin(get_thumbnail_path(preferred_thumb),"thumb_novedades.png"),viewmode="movie") )
     #itemlist.append( Item(title=config.get_localized_string(30118) , channel="channelselector" , action="channeltypes", thumbnail = urlparse.urljoin(get_thumbnail_path(preferred_thumb),"thumb_canales.png"),viewmode="movie") )
@@ -75,11 +75,10 @@ def getchanneltypes(preferred_thumb=""):
     logger.info("channelselector getchanneltypes")
 
     # Lista de categorias
-    valid_types = ["movie", "serie", "anime", "documentary", "vos", "torrent", "latino", "adult"]
+    valid_types = ["top channels", "movie", "serie", "anime", "documentary", "vos", "torrent", "saghe"]
     dict_cat_lang = {'movie': config.get_localized_string(30122), 'serie': config.get_localized_string(30123),
                      'anime': config.get_localized_string(30124), 'documentary': config.get_localized_string(30125),
-                     'vos': config.get_localized_string(30136), 'adult': config.get_localized_string(30126),
-                     'latino': config.get_localized_string(30127)}
+                     'vos': config.get_localized_string(30136), 'torrent': 'Torrent', 'saghe': 'Saghe', 'top channels': 'Top Channels'}
 
     # Lee la lista de canales
     channel_path = os.path.join(config.get_runtime_path(), "channels", '*.xml')
@@ -226,7 +225,7 @@ def filterchannels(category,preferred_thumb=""):
         if preferred_thumb=="bannermenu" and "bannermenu" in channel_parameters:
             channel_parameters["thumbnail"] = channel_parameters["bannermenu"]
 
-        channelslist.insert( 0 , Item( title="Tengo una URL"  ,action="mainlist", channel="tengourl" , thumbnail=channel_parameters["thumbnail"], type="generic" ,viewmode="movie" ))
+        channelslist.insert( 0 , Item( title="[COLOR gray] Inserisci un URL[/COLOR]"  ,action="mainlist", channel="tengourl" , thumbnail=channel_parameters["thumbnail"], type="generic" ,viewmode="movie" ))
 
     return channelslist
 
