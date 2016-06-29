@@ -5,7 +5,8 @@
         "active": true,
         "adult": false,
         "category": [
-                     "serie"
+                     "serie",
+                     "top channels"
                     ],
         "language": "it",
         "thumbnail": "http://www.vediserie.com/wp-content/uploads/2015/09/logo-vediseriea.png",

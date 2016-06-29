@@ -5,7 +5,8 @@
         "active": true,
         "adult": false,
         "category": [
-                     "movie"
+                     "movie",
+                     "top channels"
                     ],
         "language": "it",
         "thumbnail": "http://mondolunatico.altervista.org/blog/wp-content/uploads/2013/05/images-11.jpg",

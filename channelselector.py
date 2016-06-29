@@ -75,7 +75,7 @@ def getchanneltypes(preferred_thumb=""):
     logger.info("channelselector getchanneltypes")
 
     # Lista de categorias
-    valid_types = ["top channels", "movie", "serie", "anime", "documentary", "vos", "torrent", "saghe"]
+    valid_types = ["top channels", "movie", "serie", "anime", "saghe", "documentary", "vos", "torrent"]
     dict_cat_lang = {'movie': config.get_localized_string(30122), 'serie': config.get_localized_string(30123),
                      'anime': config.get_localized_string(30124), 'documentary': config.get_localized_string(30125),
                      'vos': config.get_localized_string(30136), 'torrent': 'Torrent', 'saghe': 'Saghe', 'top channels': 'Top Channels'}
