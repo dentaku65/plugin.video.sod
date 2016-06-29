@@ -14,6 +14,7 @@ from core import config
 from core import logger
 from core import scrapertools
 from core.item import Item
+from core.tmdb import infoSod
 from servers import servertools
 
 __channel__ = "itastreaming"
@@ -141,38 +142,19 @@ def searchfilm(item):
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for scrapedthumbnail, scrapedtitle, scrapedurl in matches:
-
         scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
-        year = scrapertools.find_single_match(scrapedtitle, '\((\d+)\)')
 
         # ------------------------------------------------
         scrapedthumbnail += "|" + _headers
         # ------------------------------------------------
-
-        try:
-            plot, fanart, poster, extrameta = info(scrapedtitle, year)
-
-            itemlist.append(
-                Item(channel=__channel__,
-                     thumbnail=poster,
-                     fanart=fanart if fanart != "" else poster,
-                     extrameta=extrameta,
-                     plot=str(plot),
-                     action="findvideos",
-                     title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
-                     url=scrapedurl,
-                     fulltitle=scrapedtitle,
-                     show=scrapedtitle,
-                     folder=True))
-        except:
-            itemlist.append(
-                Item(channel=__channel__,
-                     action="findvideos",
-                     title=scrapedtitle,
-                     url=scrapedurl,
-                     thumbnail=scrapedthumbnail,
-                     fulltitle=scrapedtitle,
-                     show=scrapedtitle))
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action="findvideos",
+                 title=scrapedtitle,
+                 url=scrapedurl,
+                 thumbnail=scrapedthumbnail,
+                 fulltitle=scrapedtitle,
+                 show=scrapedtitle), tipo='movie'))
 
     # Paginación
     next_page = re.compile('<link rel="next" href="(.+?)"/>', re.DOTALL).findall(data)
@@ -307,40 +289,19 @@ def fichas(item):
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for scrapedurl, scrapedtitle, scrapedthumbnail in matches:
-
         scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
 
         # ------------------------------------------------
         scrapedthumbnail += "|" + _headers
         # ------------------------------------------------
-        tmdbtitle1 = scrapedtitle.split("[")[0]
-        tmdbtitle = tmdbtitle1.split("(")[0]
-        year = scrapertools.find_single_match(scrapedtitle, '\((\d+)\)')
-
-        try:
-            plot, fanart, poster, extrameta = info(tmdbtitle, year)
-
-            itemlist.append(
-                Item(channel=__channel__,
-                     thumbnail=poster,
-                     fanart=fanart if fanart != "" else poster,
-                     extrameta=extrameta,
-                     plot=str(plot),
-                     action="findvideos",
-                     title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
-                     url=scrapedurl,
-                     fulltitle=scrapedtitle,
-                     show=scrapedtitle,
-                     folder=True))
-        except:
-            itemlist.append(
-                Item(channel=__channel__,
-                     action="findvideos",
-                     title=scrapedtitle,
-                     url=scrapedurl,
-                     thumbnail=scrapedthumbnail,
-                     fulltitle=scrapedtitle,
-                     show=scrapedtitle))
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action="findvideos",
+                 title=scrapedtitle,
+                 url=scrapedurl,
+                 thumbnail=scrapedthumbnail,
+                 fulltitle=scrapedtitle,
+                 show=scrapedtitle), tipo='movie'))
 
     # Paginación
     next_page = re.compile('<link rel="next" href="(.+?)"/>', re.DOTALL).findall(data)
@@ -457,20 +418,3 @@ def unescape(par1, par2, par3):
     var1 = re.sub("%26", "&", var1)
     var1 = re.sub("%3B", ";", var1)
     return var1.replace('<!--?--><?', '<!--?-->')
-
-
-def info(title, year):
-    logger.info("streamondemand.itastreaming info")
-    try:
-        from core.tmdb import Tmdb
-        oTmdb = Tmdb(texto_buscado=title, year=year, tipo="movie", include_adult="false", idioma_busqueda="it")
-        if oTmdb.total_results > 0:
-            extrameta = {"Year": oTmdb.result["release_date"][:4],
-                         "Genre": ", ".join(oTmdb.result["genres"]),
-                         "Rating": float(oTmdb.result["vote_average"])}
-            fanart = oTmdb.get_backdrop()
-            poster = oTmdb.get_poster()
-            plot = oTmdb.get_sinopsis()
-            return plot, fanart, poster, extrameta
-    except:
-        pass
