@@ -5,7 +5,8 @@
         "active": true,
         "adult": false,
         "category": [
-            "anime"
+            "serie",
+            "top channels"
         ],
         "language": "it",
         "thumbnail": "http://www.leserie.tv/templates/LeserieTv/images/logo.png",

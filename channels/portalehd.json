@@ -5,7 +5,8 @@
         "active": true,
         "adult": false,
         "category": [
-                     "movie"
+                     "movie",
+                     "top channels"
                     ],
         "language": "it",
         "thumbnail": "https://raw.githubusercontent.com/Zanzibar82/images/master/posters/portalehd.png",

@@ -6,7 +6,8 @@
         "adult": false,
         "category": [
                      "serie",
-                     "movie"
+                     "movie",
+                     "top channels"
                     ],
         "language": "it",
         "thumbnail": "https://raw.githubusercontent.com/Zanzibar82/images/master/posters/tantifilm.png",
