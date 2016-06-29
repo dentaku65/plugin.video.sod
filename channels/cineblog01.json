@@ -6,6 +6,7 @@
         "adult": false,
         "category": [
                      "movie",
+                     "top channels",
                      "serie",
                      "anime"
                     ],
