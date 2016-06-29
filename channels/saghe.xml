@@ -2,7 +2,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <channel>
 	<id>saghe</id>
-	<name>Saghe</name>
+	<name>Collection Saghe</name>
 
 	<active>true</active>
 	<adult>false</adult>
