@@ -51,6 +51,8 @@ class Item(object):
         kwargs.setdefault("server", "")      #Servidor que contiene el vídeo
         kwargs.setdefault("extra", "")              #Datos extra
 
+        kwargs.setdefault("type", "")              #dentaku65 - needed for biblioteca
+
         kwargs.setdefault("language", "")           #Idioma del contenido
         kwargs.setdefault("context", "")            #Items para el Menú Contextual
         kwargs.setdefault("subtitle", "")           #Subtitulos
