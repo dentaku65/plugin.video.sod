@@ -13,6 +13,7 @@ from core import config
 from core import logger
 from core import scrapertools
 from core.item import Item
+from core.tmdb import infoSod
 from servers import servertools
 
 __channel__ = "mondolunatico"
@@ -129,34 +130,16 @@ def peliculas(item):
     for scrapedurl, scrapedthumbnail, scrapedtitle, in matches:
         scrapedplot = ""
         title = scrapertools.decodeHtmlentities(scrapedtitle)
-        tmdbtitle = title.split("(")[0]
-        year = scrapertools.find_single_match(title, '\((\d+)\)')
-        try:
-            plot, fanart, poster, extrameta = info(tmdbtitle, year)
-
-            itemlist.append(
-                Item(channel=__channel__,
-                     thumbnail=poster,
-                     fanart=fanart if fanart != "" else poster,
-                     extrameta=extrameta,
-                     plot=str(plot),
-                     action="findvideos",
-                     title=title,
-                     url=scrapedurl,
-                     fulltitle=title,
-                     show=title,
-                     folder=True))
-        except:
-            itemlist.append(
-                Item(channel=__channel__,
-                     action="findvideos",
-                     title=title,
-                     url=scrapedurl,
-                     thumbnail=scrapedthumbnail,
-                     fulltitle=title,
-                     show=title,
-                     plot=scrapedplot,
-                     folder=True))
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action="findvideos",
+                 title=title,
+                 url=scrapedurl,
+                 thumbnail=scrapedthumbnail,
+                 fulltitle=title,
+                 show=title,
+                 plot=scrapedplot,
+                 folder=True), tipo='movie'))
 
     # Extrae el paginador
     patronvideos = '<a class="nextpostslink" rel="next" href="([^"]+)">'
@@ -291,20 +274,3 @@ def play(item):
         itemlist.append(item)
 
     return itemlist
-
-
-def info(title, year):
-    logger.info("streamondemand.mondolunatico info")
-    try:
-        from core.tmdb import Tmdb
-        oTmdb = Tmdb(texto_buscado=title, year=year, tipo="movie", include_adult="false", idioma_busqueda="it")
-        if oTmdb.total_results > 0:
-            extrameta = {"Year": oTmdb.result["release_date"][:4],
-                         "Genre": ", ".join(oTmdb.result["genres"]),
-                         "Rating": float(oTmdb.result["vote_average"])}
-            fanart = oTmdb.get_backdrop()
-            poster = oTmdb.get_poster()
-            plot = oTmdb.get_sinopsis()
-            return plot, fanart, poster, extrameta
-    except:
-        pass
