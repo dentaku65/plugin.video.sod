@@ -25,7 +25,7 @@ except:
 
 DEBUG = True
 
-def addnewfolderextra(item, totalItems=0, extrameta=None):
+def addnewfolderextra(item, totalItems=0):
 
     if item.fulltitle=="":
         item.fulltitle=item.title
@@ -49,8 +49,6 @@ def addnewfolderextra(item, totalItems=0, extrameta=None):
     listitem = xbmcgui.ListItem( item.title, iconImage="DefaultFolder.png", thumbnailImage=item.thumbnail )
 
     listitem.setInfo( "video", { "Title" : item.title, "Plot" : item.plot, "Studio" : item.channel.capitalize() } )
-
-    if extrameta: listitem.setInfo( "video", extrameta )
 
     set_infoLabels(listitem,item.plot) # Modificacion introducida por super_berny para añadir infoLabels al ListItem
 
@@ -107,7 +105,7 @@ def addnewfolderextra(item, totalItems=0, extrameta=None):
             ok = xbmcplugin.addDirectoryItem( handle = pluginhandle, url = itemurl , listitem=listitem, isFolder=True, totalItems=totalItems)
     return ok
 
-def addnewvideo(item, IsPlayable='false', totalItems = 0, extrameta=None):
+def addnewvideo(item, IsPlayable='false', totalItems = 0):
     contextCommands = []
     ok = False
     try:
@@ -126,8 +124,6 @@ def addnewvideo(item, IsPlayable='false', totalItems = 0, extrameta=None):
 
     listitem = xbmcgui.ListItem( item.title, iconImage="DefaultVideo.png", thumbnailImage=item.thumbnail )
     listitem.setInfo( "video", { "Title" : item.title, "FileName" : item.title, "Plot" : item.plot, "Duration" : item.duration, "Studio" : item.channel.capitalize(), "Genre" : item.category } )
-
-    if extrameta: listitem.setInfo( "video", extrameta )
 
     set_infoLabels(listitem,item.plot) # Modificacion introducida por super_berny para añadir infoLabels al ListItem
         
