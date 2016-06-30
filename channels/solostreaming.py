@@ -217,7 +217,7 @@ def showupdateserietv(item):
             apisingle = host + "/sod/api.php?get=serietv&type=episodi&uri=" + uri + "&ep_num=" + ep_num + "&sub=" + urllib.quote_plus(
                 type)
 
-            fulltitle = serie + ' - ' + ep_num + ' ' + titolo
+            fulltitle = serie + ' | ' + ep_num + ' ' + titolo
             frm_title = "[COLOR white](%s)[/COLOR] [B][COLOR royalblue]%s[/COLOR][/B] [B][COLOR deepskyblue]- %s %s[/COLOR][/B]" % (
                 type.upper(), serie, ep_num, titolo)
         else:
@@ -228,7 +228,7 @@ def showupdateserietv(item):
             apisingle = host + "/sod/api.php?get=anime&type=episodi&uri=" + uri + "&e_num=" + e_num + "&s_num=" + s_num + "&sub=" + urllib.quote_plus(
                 type)
 
-            fulltitle = serie + ' - ' + s_num + 'x' + e_num
+            fulltitle = serie + ' | ' + s_num + 'x' + e_num
             frm_title = "[COLOR white](%s)[/COLOR] [B][COLOR royalblue]%s[/COLOR][/B] [B][COLOR deepskyblue]- %sx%s[/COLOR][/B]" % (
                 type.upper(), serie, s_num, e_num)
 
@@ -269,7 +269,7 @@ def updateserietv(item):
             apisingle = host + "/sod/api.php?get=serietv&type=episodi&uri=" + uri + "&ep_num=" + ep_num + "&sub=" + urllib.quote_plus(
                 type)
 
-            fulltitle = serie + ' - ' + ep_num + ' ' + titolo
+            fulltitle = serie + ' | ' + ep_num + ' ' + titolo
             frm_title = "[COLOR white](%s)[/COLOR] [B][COLOR royalblue]%s[/COLOR][/B] [B][COLOR deepskyblue]- %s %s[/COLOR][/B]" % (
                 type.upper(), serie, ep_num, titolo)
         else:
@@ -280,7 +280,7 @@ def updateserietv(item):
             apisingle = host + "/sod/api.php?get=anime&type=episodi&uri=" + uri + "&e_num=" + e_num + "&s_num=" + s_num + "&sub=" + urllib.quote_plus(
                 type)
 
-            fulltitle = serie + ' - ' + s_num + 'x' + e_num
+            fulltitle = serie + ' | ' + s_num + 'x' + e_num
             frm_title = "[COLOR white](%s)[/COLOR] [B][COLOR royalblue]%s[/COLOR][/B] [B][COLOR deepskyblue]- %sx%s[/COLOR][/B]" % (
                 type.upper(), serie, s_num, e_num)
 
