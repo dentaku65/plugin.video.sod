@@ -97,7 +97,13 @@ def peliculas(item):
         scrapedthumbnail += "|" + _headers
         ## ------------------------------------------------
 
-        itemlist.append(infoSod(Item(channel=__channel__, action="findvid", title=scrapedtitle, fulltitle=scrapedtitle, url=scrapedurl, thumbnail=scrapedthumbnail), tipo="movie"))
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action="findvideos",
+                 title=scrapedtitle,
+                 fulltitle=scrapedtitle,
+                 url=scrapedurl,
+                 thumbnail=scrapedthumbnail), tipo="movie"))
 
     # Extrae el paginador
     patronvideos = 'class="nextpostslink" rel="next" href="([^"]+)">&raquo;'
@@ -120,9 +126,11 @@ def peliculas(item):
 
     return itemlist
 
+
 def HomePage(item):
     import xbmc
     xbmc.executebuiltin("ReplaceWindow(10024,plugin://plugin.video.streamondemand)")
+
 
 def categorias(item):
     logger.info("streamondemand.altadefinizione01 categorias")
@@ -169,7 +177,7 @@ def search(item, texto):
         return []
 
 
-def findvid(item):
+def findvideos(item):
     logger.info("[altadefinizione01.py] findvideos")
 
     # Descarga la página
@@ -205,5 +213,3 @@ def anti_cloudflare(url):
         scrapertools.get_headers_from_response(s + '://' + h + "/" + resp_headers['refresh'][7:], headers=headers)
 
     return scrapertools.cache_page(url, headers=headers)
-
-
