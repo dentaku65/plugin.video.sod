@@ -5,19 +5,17 @@
 # http://blog.tvalacarta.info/plugin-xbmc/
 #------------------------------------------------------------
 
-import urllib
-import urllib2
 import os
 import re
 import sys
-from core.item import Item
-from core import logger
-from core import config
-from core import scrapertools
+import urllib
+import urllib2
+
 from core import channeltools
-from core import updater
-from platformcode import guitools
-from platformcode import xbmctools
+from core import config
+from core import logger
+from core.item import Item
+
 
 def start():
     ''' Primera funcion que se ejecuta al entrar en el plugin.
@@ -330,7 +328,7 @@ def run():
                         f = open( nombre_fichero_config_canal , "w" )
                         f.write(contenido)
                     from platformcode import library
-                    f.write( library.title_to_folder_name(item.show)+","+item.url+","+item.channel+"\n")
+                    f.write( library.title_to_folder_name(item.show)+","+item.url+","+item.channel+","+item.extra+"\n")
                     f.close();
 
                 elif item.action=="download_all_episodes":
@@ -689,8 +687,7 @@ def download_all_episodes(item,channel,first_episode="",preferred_server="vidspo
 
         # Extrae los mirrors
         try:
-            #mirrors_itemlist = channel.findvideos(episode_item)
-            exec "mirrors_itemlist = channel."+episode_item.action+"(episode_item)"
+            mirrors_itemlist = channel.findvideos(episode_item)
         except:
             mirrors_itemlist = servertools.find_video_items(episode_item)
         print mirrors_itemlist
