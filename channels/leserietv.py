@@ -6,15 +6,15 @@
 #  By Costaplus
 # ------------------------------------------------------------
 import re
-import sys
 import urlparse
-import urllib2
+
 import xbmc
+
 from core import config
 from core import logger
 from core import scrapertools
 from core.item import Item
-from servers import servertools
+from core.tmdb import infoSod
 
 __channel__ = "leserietv"
 __category__ = "F"
@@ -24,31 +24,33 @@ __language__ = "IT"
 
 DEBUG = config.get_setting("debug")
 
-host = "http://www.leserie.tv"
+host = 'http://www.leserie.tv'
 
 header = [
     ['User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:38.0) Gecko/20100101 Firefox/38.0'],
     ['Accept-Encoding', 'gzip, deflate'],
-    ['Referer', 'http://www.leserie.tv/streaming/']
+    ['Referer', ('%s/streaming/' % host)]
 ]
+
 
 def isGeneric():
     return True
 
-#-----------------------------------------------------------------
+
+# -----------------------------------------------------------------
 def mainlist(item):
     logger.info("[leserietv.py] mainlist")
-    itemlist =[]
+    itemlist = []
     itemlist.append(Item(channel=__channel__,
                          action="novita",
                          title="[COLOR yellow]Novità[/COLOR]",
-                         url="http://www.leserie.tv/streaming/",
+                         url=("%s/streaming/" % host),
                          thumbnail="http://www.ilmioprofessionista.it/wp-content/uploads/2015/04/TVSeries3.png",
                          fanart="http://www.macroidee.it/wp-content/uploads/2015/06/migliori-serie-da-vedere.jpg"))
     itemlist.append(Item(channel=__channel__,
                          action="lista_serie",
                          title="[COLOR azure]Tutte le serie[/COLOR]",
-                         url="http://www.leserie.tv/streaming/",
+                         url=("%s/streaming/" % host),
                          thumbnail="http://www.ilmioprofessionista.it/wp-content/uploads/2015/04/TVSeries3.png",
                          fanart="http://www.macroidee.it/wp-content/uploads/2015/06/migliori-serie-da-vedere.jpg"))
 
@@ -61,9 +63,9 @@ def mainlist(item):
     itemlist.append(Item(channel=__channel__,
                          action="top50",
                          title="[COLOR azure]Top 50[/COLOR]",
-                         url="http://www.leserie.tv/top50.html",
+                         url=("%s/top50.html" % host),
                          thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png",
-                         fanart = "http://www.macroidee.it/wp-content/uploads/2015/06/migliori-serie-da-vedere.jpg"))
+                         fanart="http://www.macroidee.it/wp-content/uploads/2015/06/migliori-serie-da-vedere.jpg"))
 
     itemlist.append(Item(channel=__channel__,
                          action="search",
@@ -72,125 +74,103 @@ def mainlist(item):
                          fanart="http://www.kaushik.net/avinash/wp-content/uploads/2010/02/search_engine.png"))
 
     return itemlist
-#=================================================================
 
 
-#-----------------------------------------------------------------
+# =================================================================
+
+
+# -----------------------------------------------------------------
 def novita(item):
     logger.info("streamondemand.laserietv novità")
     itemlist = []
 
     data = scrapertools.cache_page(item.url)
 
-
-    patron ='<div class="video-item-cover"[^<]+<a href="(.*?)">[^<]+<img src="(.*?)" alt="(.*?)">'
+    patron = '<div class="video-item-cover"[^<]+<a href="(.*?)">[^<]+<img src="(.*?)" alt="(.*?)">'
     matches = re.compile(patron, re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
 
-    for scrapedurl,scrapedthumbnail,scrapedtitle in matches:
-        if (DEBUG): logger.info("title=[" + scrapedtitle + "], url=[" + scrapedurl + "], thumbnail=[" + scrapedthumbnail + "]")
-
-
-        try:
-            tmdbtitle = scrapedtitle
-            plot, fanart, poster, extrameta = info(tmdbtitle)
-
-            itemlist.append(Item(channel=__channel__,
-                                 thumbnail=poster,
-                                 fanart=fanart if fanart != "" else poster,
-                                 extrameta=extrameta,
-                                 plot=str(plot),
-                                 action="episodi",
-                                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
-                                 url=scrapedurl,
-                                 fulltitle=scrapedtitle,
-                                 show=scrapedtitle,
-                                 folder=True))
-        except:
-
-             itemlist.append(Item(channel=__channel__,
-                                  action="episodi",
-                                  title=scrapedtitle,
-                                  url=scrapedurl,
-                                  thumbnail="",
-                                  fulltitle=scrapedtitle,
-                                  show=scrapedtitle))
+    for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
+        if (DEBUG): logger.info(
+            "title=[" + scrapedtitle + "], url=[" + scrapedurl + "], thumbnail=[" + scrapedthumbnail + "]")
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action="episodi",
+                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
+                 url=scrapedurl,
+                 thumbnail=scrapedthumbnail,
+                 fulltitle=scrapedtitle,
+                 show=scrapedtitle), tipo='tv'))
 
     # Paginazione
-    #===========================================================
+    # ===========================================================
     patron = '<div class="pages">(.*?)</div>'
     paginazione = scrapertools.find_single_match(data, patron)
     patron = '<span>.*?</span>.*?href="([^"]+)".*?</a>'
     matches = re.compile(patron, re.DOTALL).findall(paginazione)
     scrapertools.printMatches(matches)
-    #===========================================================
+    # ===========================================================
 
     if len(matches) > 0:
         paginaurl = matches[0]
-        itemlist.append(Item(channel=__channel__, action="novita", title="[COLOR orange]Successivo>>[/COLOR]", url=paginaurl,thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png",folder=True))
-        itemlist.append(Item(channel=__channel__, action="HomePage", title="[COLOR yellow]Torna Home[/COLOR]", folder=True))
+        itemlist.append(
+            Item(channel=__channel__, action="novita", title="[COLOR orange]Successivo>>[/COLOR]", url=paginaurl,
+                 thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png",
+                 folder=True))
+        itemlist.append(
+            Item(channel=__channel__, action="HomePage", title="[COLOR yellow]Torna Home[/COLOR]", folder=True))
     return itemlist
-#=================================================================
 
-#-----------------------------------------------------------------
+
+# =================================================================
+
+# -----------------------------------------------------------------
 def lista_serie(item):
     logger.info("[leserie.py] lista_serie")
     itemlist = []
 
-    post="dlenewssortby=title&dledirection=asc&set_new_sort=dle_sort_cat&set_direction_sort=dle_direction_cat"
+    post = "dlenewssortby=title&dledirection=asc&set_new_sort=dle_sort_cat&set_direction_sort=dle_direction_cat"
 
-    data =scrapertools.cachePagePost(item.url,post=post)
+    data = scrapertools.cachePagePost(item.url, post=post)
 
     patron = '<div class="video-item-cover"[^<]+<a href="(.*?)">[^<]+<img src="(.*?)" alt="(.*?)">'
     matches = re.compile(patron, re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
 
-    for scrapedurl,scrapedthumbnail,scrapedtitle in matches:
+    for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
         logger.info(scrapedurl + " " + scrapedtitle + scrapedthumbnail)
-
-        try:
-            tmdbtitle = scrapedtitle
-            plot, fanart, poster, extrameta = info(tmdbtitle)
-
-            itemlist.append(Item(channel=__channel__,
-                                 thumbnail=poster,
-                                 fanart=fanart if fanart != "" else poster,
-                                 extrameta=extrameta,
-                                 plot=str(plot),
-                                 action="episodi",
-                                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
-                                 url=scrapedurl,
-                                 fulltitle=scrapedtitle,
-                                 show=scrapedtitle,
-                                 folder=True))
-        except:
-
-                itemlist.append(Item(channel=__channel__,
-                             action="episodi",
-                             title=scrapedtitle,
-                             url=scrapedurl,
-                             thumbnail=host + scrapedthumbnail,
-                             fulltitle=scrapedtitle,
-                             show=scrapedtitle))
-
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action="episodi",
+                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
+                 url=scrapedurl,
+                 thumbnail=host + scrapedthumbnail,
+                 fulltitle=scrapedtitle,
+                 show=scrapedtitle), tipo='tv'))
 
     # Paginazione
-    #===========================================================
+    # ===========================================================
     patron = '<div class="pages">(.*?)</div>'
     paginazione = scrapertools.find_single_match(data, patron)
     patron = '<span>.*?</span>.*?href="([^"]+)".*?</a>'
     matches = re.compile(patron, re.DOTALL).findall(paginazione)
     scrapertools.printMatches(matches)
-    #===========================================================
+    # ===========================================================
 
     if len(matches) > 0:
         paginaurl = matches[0]
-        itemlist.append(Item(channel=__channel__, action="lista_serie", title="[COLOR orange]Successivo>>[/COLOR]", url=paginaurl,thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png",folder=True))
-        itemlist.append(Item(channel=__channel__, action="HomePage", title="[COLOR yellow]Torna Home[/COLOR]", folder=True))
+        itemlist.append(
+            Item(channel=__channel__, action="lista_serie", title="[COLOR orange]Successivo>>[/COLOR]", url=paginaurl,
+                 thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png",
+                 folder=True))
+        itemlist.append(
+            Item(channel=__channel__, action="HomePage", title="[COLOR yellow]Torna Home[/COLOR]", folder=True))
     return itemlist
-#=================================================================
 
-#-----------------------------------------------------------------
+
+# =================================================================
+
+# -----------------------------------------------------------------
 def categorias(item):
     logger.info("streamondemand.laserietv categorias")
     itemlist = []
@@ -209,26 +189,26 @@ def categorias(item):
         scrapedthumbnail = ""
         scrapedplot = ""
         if (DEBUG): logger.info(
-                "title=[" + scrapedtitle + "], url=[" + scrapedurl + "], thumbnail=[" + scrapedthumbnail + "]")
+            "title=[" + scrapedtitle + "], url=[" + scrapedurl + "], thumbnail=[" + scrapedthumbnail + "]")
         itemlist.append(
-                Item(channel=__channel__,
-                     action="lista_serie",
-                     title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
-                     url=scrapedurl,
-                     thumbnail=scrapedthumbnail,
-                     plot=scrapedplot))
+            Item(channel=__channel__,
+                 action="lista_serie",
+                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
+                 url=scrapedurl,
+                 thumbnail=scrapedthumbnail,
+                 plot=scrapedplot))
 
     return itemlist
 
 
-#=================================================================
+# =================================================================
 
-#-----------------------------------------------------------------
-def search(item,texto):
+# -----------------------------------------------------------------
+def search(item, texto):
     logger.info("[laserietv.py] " + item.url + " search " + texto)
-    itemlist =[]
-    url = "http://www.leserie.tv/index.php?do=search"
-    post = "do=search&subaction=search&search_start=0&full_search=0&result_from=1&story="+texto
+    itemlist = []
+    url = "%s/index.php?do=search" % host
+    post = "do=search&subaction=search&search_start=0&full_search=0&result_from=1&story=" + texto
     logger.debug(post)
     data = scrapertools.cachePagePost(url, post=post)
 
@@ -236,38 +216,23 @@ def search(item,texto):
     matches = re.compile(patron, re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
 
-    for scrapedurl,scrapedthumbnail,scrapedtitle in matches:
+    for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
         logger.info(scrapedurl + " " + scrapedtitle + scrapedthumbnail)
-
-        try:
-            tmdbtitle = scrapedtitle
-            plot, fanart, poster, extrameta = info(tmdbtitle)
-
-            itemlist.append(Item(channel=__channel__,
-                                 thumbnail=poster,
-                                 fanart=fanart if fanart != "" else poster,
-                                 extrameta=extrameta,
-                                 plot=str(plot),
-                                 action="episodi",
-                                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
-                                 url=scrapedurl,
-                                 fulltitle=scrapedtitle,
-                                 show=scrapedtitle,
-                                 folder=True))
-        except:
-
-                itemlist.append(Item(channel=__channel__,
-                             action="episodi",
-                             title=scrapedtitle,
-                             url=scrapedurl,
-                             thumbnail=host + scrapedthumbnail,
-                             fulltitle=scrapedtitle,
-                             show=scrapedtitle))
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action="episodi",
+                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
+                 url=scrapedurl,
+                 thumbnail=host + scrapedthumbnail,
+                 fulltitle=scrapedtitle,
+                 show=scrapedtitle), tipo='tv'))
 
     return itemlist
-#=================================================================
 
-#-----------------------------------------------------------------
+
+# =================================================================
+
+# -----------------------------------------------------------------
 def top50(item):
     logger.info("[laserietv.py] top50")
     itemlist = []
@@ -280,48 +245,33 @@ def top50(item):
 
     for scrapedurl, scrapedtitle in matches:
         logger.debug(scrapedurl + " " + scrapedtitle)
-
-        try:
-            tmdbtitle = scrapedtitle
-            plot, fanart, poster, extrameta = info(tmdbtitle)
-
-            itemlist.append(Item(channel=__channel__,
-                                 thumbnail=poster,
-                                 fanart=fanart if fanart != "" else poster,
-                                 extrameta=extrameta,
-                                 plot=str(plot),
-                                 action="episodi",
-                                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
-                                 url=scrapedurl,
-                                 fulltitle=scrapedtitle,
-                                 show=scrapedtitle,
-                                 folder=True))
-        except:
-
-            itemlist.append(Item(channel=__channel__,
-                                 action="episodi",
-                                 title=scrapedtitle,
-                                 url=scrapedurl,
-                                 thumbnail="",
-                                 fulltitle=scrapedtitle,
-                                 show=scrapedtitle))
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action="episodi",
+                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
+                 url=scrapedurl,
+                 thumbnail="",
+                 fulltitle=scrapedtitle,
+                 show=scrapedtitle), tipo='tv'))
 
     return itemlist
-#=================================================================
 
-#-----------------------------------------------------------------
+
+# =================================================================
+
+# -----------------------------------------------------------------
 def episodi(item):
     logger.info("[leserietv.py] episodi")
     itemlist = []
 
     data = scrapertools.cache_page(item.url)
 
-    patron ='="megadrive-(.*?)".*?data-link="([^"]+)">Megadrive'
+    patron = '="megadrive-(.*?)".*?data-link="([^"]+)">Megadrive'
     matches = re.compile(patron, re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
 
-    for scrapedtitle,scrapedurl in matches:
-        scrapedtitle = scrapedtitle.replace('_',"x")
+    for scrapedtitle, scrapedurl in matches:
+        scrapedtitle = scrapedtitle.replace('_', "x")
         xbmc.log(scrapedurl)
         itemlist.append(Item(channel=__channel__,
                              action="findvideos",
@@ -331,7 +281,6 @@ def episodi(item):
                              fanart=item.fanart if item.fanart != "" else item.scrapedthumbnail,
                              fulltitle=item.fulltitle,
                              show=item.fulltitle))
-
 
     if config.get_library_support() and len(itemlist) != 0:
         itemlist.append(
@@ -349,33 +298,14 @@ def episodi(item):
                  extra="episodi",
                  show=item.show))
 
-
     return itemlist
-#=================================================================
 
 
-#-----------------------------------------------------------------
-def info(title):
-    logger.info("[leserietv.py] info")
-    try:
-        from core.tmdb import Tmdb
-        oTmdb= Tmdb(texto_buscado=title, tipo= "tv", include_adult="false", idioma_busqueda="it")
-        count = 0
-        if oTmdb.total_results > 0:
-           extrameta = {}
-           extrameta["Year"] = oTmdb.result["release_date"][:4]
-           extrameta["Genre"] = ", ".join(oTmdb.result["genres"])
-           extrameta["Rating"] = float(oTmdb.result["vote_average"])
-           fanart=oTmdb.get_backdrop()
-           poster=oTmdb.get_poster()
-           plot=oTmdb.get_sinopsis()
-           return plot, fanart, poster, extrameta
-    except:
-        pass
-#=================================================================
+# =================================================================
 
 
-#-----------------------------------------------------------------
+# -----------------------------------------------------------------
 def HomePage(item):
     xbmc.executebuiltin("ReplaceWindow(10024,plugin://plugin.video.streamondemand)")
-#=================================================================
+
+# =================================================================
