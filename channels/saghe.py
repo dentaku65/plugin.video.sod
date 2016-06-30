@@ -4,10 +4,8 @@
 # Ricerca "Saghe"
 # http://www.mimediacenter.info/foro/viewforum.php?f=36
 # ------------------------------------------------------------
-import base64
 import datetime
 import json
-import re
 import urllib
 
 from core import config
@@ -24,7 +22,7 @@ __language__ = "IT"
 DEBUG = config.get_setting("debug")
 
 tmdb_key = 'f7f51775877e0bb6703520952b3c7840'
-#tmdb_key = base64.urlsafe_b64decode('NTc5ODNlMzFmYjQzNWRmNGRmNzdhZmI4NTQ3NDBlYTk=')
+# tmdb_key = base64.urlsafe_b64decode('NTc5ODNlMzFmYjQzNWRmNGRmNzdhZmI4NTQ3NDBlYTk=')
 dttime = (datetime.datetime.utcnow() - datetime.timedelta(hours=5))
 systime = dttime.strftime('%Y%m%d%H%M%S%f')
 today_date = dttime.strftime('%Y-%m-%d')
@@ -82,7 +80,6 @@ def mainlist(item):
                      url='http://api.themoviedb.org/3/list/51224e42760ee3297424a1e0?api_key=%s&language=it' % tmdb_key,
                      thumbnail="https://image.tmdb.org/t/p/w180_and_h270_bestv2/vGV35HBCMhQl2phhGaQ29P08ZgM.jpg")]
     return itemlist
-
 
 
 def tmdb_saghe(item):
@@ -216,4 +213,3 @@ def do_search(item):
         progreso.close()
 
     return itemlist
-
