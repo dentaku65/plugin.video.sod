@@ -34,21 +34,25 @@ def mainlist(item):
     itemlist = [Item(channel=__channel__,
                      title="[COLOR azure]Film - Archivio[/COLOR]",
                      action="peliculas",
+                     extra='film',
                      url="%s/category/film-in-streaming-vk-putlocker/" % host,
                      thumbnail="http://repository-butchabay.googlecode.com/svn/branches/eden/skin.cirrus.extended.v2/extras/moviegenres/All%20Movies.png"),
                 Item(channel=__channel__,
                      title="[COLOR azure]Serie TV[/COLOR]",
                      action="serietv",
+                     extra='serie',
                      url="%s/category/serie-tv-archive/" % host,
                      thumbnail="http://xbmc-repo-ackbarr.googlecode.com/svn/trunk/dev/skin.cirrus%20extended%20v2/extras/moviegenres/New%20TV%20Shows.png"),
                 Item(channel=__channel__,
                      title="[COLOR azure]Anime / Cartoni[/COLOR]",
                      action="serietv",
+                     extra='serie',
                      url="%s/category/anime-cartoni-animati/" % host,
                      thumbnail="http://orig09.deviantart.net/df5a/f/2014/169/2/a/fist_of_the_north_star_folder_icon_by_minacsky_saya-d7mq8c8.png"),
                 Item(channel=__channel__,
                      title="[COLOR yellow]Cerca...[/COLOR]",
                      action="search",
+                     extra='serie',
                      thumbnail="http://dc467.4shared.com/img/fEbJqOum/s7/13feaf0c8c0/Search")]
 
     return itemlist
@@ -85,6 +89,7 @@ def peliculas(item):
                  url=scrapedurl,
                  thumbnail=scrapedthumbnail,
                  plot=scrapedplot,
+                 extra=item.extra,
                  folder=True), tipo='movie'))
 
     # Extrae el paginador
@@ -104,6 +109,7 @@ def peliculas(item):
                  title="[COLOR orange]Successivo >>[/COLOR]",
                  url=scrapedurl,
                  thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png",
+                 extra=item.extra,
                  folder=True))
 
     return itemlist
@@ -140,6 +146,7 @@ def serietv(item):
                  url=scrapedurl,
                  thumbnail=scrapedthumbnail,
                  plot=scrapedplot,
+                 extra=item.extra,
                  folder=True), tipo='tv'))
 
     # Extrae el paginador
@@ -159,6 +166,7 @@ def serietv(item):
                  title="[COLOR orange]Successivo >>[/COLOR]",
                  url=scrapedurl,
                  thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png",
+                 extra=item.extra,
                  folder=True))
 
     return itemlist
@@ -191,13 +199,13 @@ def episodios(item):
                 scrapedtitle = scrapertools.find_single_match(data[:end], '\d+[^\d]+\d+')
                 itemlist.append(
                     Item(channel=__channel__,
-                         action="findvid_serie",
+                         action="findvideos",
                          title=scrapedtitle + " (" + lang_title + ")",
-                         url=item.url,
+                         url=data,
                          thumbnail=item.thumbnail,
-                         extra=data,
-                         fulltitle=item.title,
-                         show=item.title))
+                         extra=item.extra,
+                         fulltitle=item.show + ' | ' + scrapedtitle + " (" + lang_title + ")",
+                         show=item.show))
 
     logger.info("[eurostreaming.py] episodios")
 
@@ -237,24 +245,24 @@ def episodios(item):
                  title=item.title,
                  url=item.url,
                  action="add_serie_to_library",
-                 extra="episodios",
+                 extra="episodios" + "###" + item.extra,
                  show=item.show))
         itemlist.append(
             Item(channel=item.channel,
                  title="Scarica tutti gli episodi della serie",
                  url=item.url,
                  action="download_all_episodes",
-                 extra="episodios",
+                 extra="episodios" + "###" + item.extra,
                  show=item.show))
 
     return itemlist
 
 
-def findvid_serie(item):
+def findvideos(item):
     logger.info("[eurostreaming.py] findvideos")
 
     ## Descarga la página
-    data = item.extra
+    data = item.url if item.extra == 'serie' else scrapertools.cache_page(item.url)
 
     itemlist = servertools.find_video_items(data=data)
     for videoitem in itemlist:
