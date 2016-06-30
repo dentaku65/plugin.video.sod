@@ -5,13 +5,15 @@
 # http://blog.tvalacarta.info/plugin-xbmc/streamondemand.
 # ------------------------------------------------------------
 import re
-import sys
+import time
 import urllib2
+import urlparse
 
 from core import config
 from core import logger
 from core import scrapertools
 from core.item import Item
+from core.tmdb import infoSod
 from servers import servertools
 
 __channel__ = "vediserie"
@@ -81,10 +83,10 @@ def list_a_z(item):
 
     for scrapedurl, scrapedtitle in matches:
         itemlist.append(
-                Item(channel=__channel__,
-                     action="episodios",
-                     title=scrapedtitle,
-                     url=scrapedurl))
+            Item(channel=__channel__,
+                 action="episodios",
+                 title=scrapedtitle,
+                 url=scrapedurl))
 
     return itemlist
 
@@ -119,39 +121,24 @@ def fichas(item):
         scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
         if scrapedtitle.startswith('<span class="year">'):
             scrapedtitle = scrapedtitle[19:]
-        try:
-           plot, fanart, poster, extrameta = info_tv(scrapedtitle)
 
-           itemlist.append(
-               Item(channel=__channel__,
-                    thumbnail=poster,
-                    fanart=fanart if fanart != "" else poster,
-                    extrameta=extrameta,
-                    plot=str(plot),
-                    action="episodios",
-                    title=scrapedtitle,
-                    url=scrapedurl.replace('"', ''),
-                    fulltitle=scrapedtitle,
-                    show=scrapedtitle,
-                    folder=True))
-        except:
-           itemlist.append(
-               Item(channel=__channel__,
-                    action="episodios",
-                    title=scrapedtitle,
-                    fulltitle=scrapedtitle,
-                    url=scrapedurl.replace('"', ''),
-                    show=scrapedtitle,
-                    thumbnail=scrapedthumbnail))
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action="episodios",
+                 title=scrapedtitle,
+                 fulltitle=scrapedtitle,
+                 url=scrapedurl.replace('"', ''),
+                 show=scrapedtitle,
+                 thumbnail=scrapedthumbnail), tipo='tv'))
 
     patron = '<a class="nextpostslink" rel="next" href="([^"]+)">»</a>'
     next_page = scrapertools.find_single_match(data, patron)
     if next_page != "":
         itemlist.append(
-                Item(channel=__channel__,
-                     action="fichas",
-                     title="[COLOR orange]Successivo>>[/COLOR]",
-                     url=next_page))
+            Item(channel=__channel__,
+                 action="fichas",
+                 title="[COLOR orange]Successivo>>[/COLOR]",
+                 url=next_page))
 
     return itemlist
 
@@ -176,30 +163,30 @@ def episodios(item):
         if len(episode) == 1: episode = "0" + episode
         title = season + "x" + episode
         itemlist.append(
-                Item(channel=__channel__,
-                     action="findvid_serie",
-                     title=title,
-                     url=item.url,
-                     thumbnail=item.thumbnail,
-                     extra=url,
-                     fulltitle=item.fulltitle,
-                     show=item.show))
+            Item(channel=__channel__,
+                 action="findvid_serie",
+                 title=title,
+                 url=item.url,
+                 thumbnail=item.thumbnail,
+                 extra=url,
+                 fulltitle=item.fulltitle,
+                 show=item.show))
 
     if config.get_library_support() and len(itemlist) != 0:
         itemlist.append(
-                Item(channel=__channel__,
-                     title=item.title,
-                     url=item.url,
-                     action="add_serie_to_library",
-                     extra="episodios",
-                     show=item.show))
+            Item(channel=__channel__,
+                 title=item.title,
+                 url=item.url,
+                 action="add_serie_to_library",
+                 extra="episodios",
+                 show=item.show))
         itemlist.append(
-                Item(channel=item.channel,
-                     title="Scarica tutti gli episodi della serie",
-                     url=item.url,
-                     action="download_all_episodes",
-                     extra="episodios",
-                     show=item.show))
+            Item(channel=item.channel,
+                 title="Scarica tutti gli episodi della serie",
+                 url=item.url,
+                 action="download_all_episodes",
+                 extra="episodios",
+                 show=item.show))
 
     return itemlist
 
@@ -221,6 +208,7 @@ def findvid_serie(item):
 
     return itemlist
 
+
 def anti_cloudflare(url):
     # global headers
 
@@ -239,22 +227,3 @@ def anti_cloudflare(url):
         scrapertools.get_headers_from_response(s + '://' + h + "/" + resp_headers['refresh'][7:], headers=headers)
 
     return scrapertools.cache_page(url, headers=headers)
-
-def info_tv(title):
-    logger.info("streamondemand.vediserie info")
-    try:
-        from core.tmdb import Tmdb
-        oTmdb= Tmdb(texto_buscado=title, tipo= "tv", include_adult="true", idioma_busqueda="it")
-        count = 0
-        if oTmdb.total_results > 0:
-           extrameta = {}
-           extrameta["Year"] = oTmdb.result["release_date"][:4]
-           extrameta["Genre"] = ", ".join(oTmdb.result["genres"])
-           extrameta["Rating"] = float(oTmdb.result["vote_average"])
-           fanart=oTmdb.get_backdrop()
-           poster=oTmdb.get_poster()
-           plot=oTmdb.get_sinopsis()
-           return plot, fanart, poster, extrameta
-    except:
-        pass	
-
