@@ -25,7 +25,7 @@ __language__ = "IT"
 
 DEBUG = config.get_setting("debug")
 
-host = "http://www.portalehd.com"
+host = "http://www.24hd.online"
 
 headers = [
     ['User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:38.0) Gecko/20100101 Firefox/38.0'],
@@ -131,16 +131,13 @@ def peliculas(item):
     # ------------------------------------------------
 
     # Extrae las entradas (carpetas)
-    patron = '<div class="ThreeTablo T-FilmBaslik">\s*'
-    patron += '<h2><a href="([^"]+)" title="([^"]+)">.*?</h2>\s*'
-    patron += '</div>\s*'
-    patron += '<a[^>]+>\s*'
-    patron += '<figure><img src="([^"]+)"[^>]+>'
+    patron = 'src="(.*?)" class="attachment-category-thumb[^>]+><a href="([^"]+)" title=[^>]+><b class="title">(.*?)</a>'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
-    for scrapedurl, scrapedtitle, scrapedthumbnail in matches:
+    for scrapedthumbnail, scrapedurl, scrapedtitle in matches:
         scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
         scrapedplot = ""
+        #scrapedthumbnail = ""
         # ------------------------------------------------
         scrapedthumbnail += "|" + _headers
         # ------------------------------------------------
