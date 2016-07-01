@@ -75,9 +75,8 @@ def getchanneltypes(preferred_thumb=""):
     logger.info("channelselector getchanneltypes")
 
     # Lista de categorias
-    valid_types = ["anime", "documentary", "vos", "torrent"]
-    dict_cat_lang = {'anime': config.get_localized_string(30124), 'documentary': config.get_localized_string(30125),
-                     'vos': config.get_localized_string(30136), 'torrent': 'Torrent'}
+    valid_types = ["vos", "torrent"]
+    dict_cat_lang = {'vos': config.get_localized_string(30136), 'torrent': 'Torrent'}
 
     # Lee la lista de canales
     channel_path = os.path.join(config.get_runtime_path(), "channels", '*.xml')
@@ -131,6 +130,12 @@ def getchanneltypes(preferred_thumb=""):
     itemlist.append(Item(title=config.get_localized_string(30123), channel="channelselector", action="listchannels",
                          category="serie", thumbnail=urlparse.urljoin(get_thumbnail_path(preferred_thumb),
                                                                     "thumb_canales_series.png"), viewmode="movie"))
+    itemlist.append(Item(title=config.get_localized_string(30124), channel="channelselector", action="listchannels",
+                         category="anime", thumbnail=urlparse.urljoin(get_thumbnail_path(preferred_thumb),
+                                                                    "thumb_canales_anime.png"), viewmode="movie"))
+    itemlist.append(Item(title=config.get_localized_string(30125), channel="channelselector", action="listchannels",
+                         category="documentary", thumbnail=urlparse.urljoin(get_thumbnail_path(preferred_thumb),
+                                                                    "thumb_canales_documentales.png"), viewmode="movie"))
     itemlist.append(Item(title="Saghe", channel="saghe", action="mainlist",
                          category="saghe", thumbnail=urlparse.urljoin(get_thumbnail_path(preferred_thumb),
                                                                     "thumb_canales.png"), viewmode="movie"))
