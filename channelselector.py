@@ -23,7 +23,7 @@ def getmainlist(preferred_thumb=""):
 
     # Añade los canales que forman el menú principal
 
-    #itemlist.append( Item( title=config.get_localized_string(30121) , channel="channelselector" , action="channeltypes" , thumbnail=urlparse.urljoin(get_thumbnail_path(preferred_thumb),"thumb_canales_todos.png"),viewmode="movie") )
+    itemlist.append( Item( title=config.get_localized_string(30121) , channel="channelselector" , action="listchannels" , category="all" , thumbnail=urlparse.urljoin(get_thumbnail_path(preferred_thumb),"thumb_canales_todos.png"),viewmode="movie") )
     itemlist.append( Item(title=config.get_localized_string(30119) , channel="channelselector" , action="channeltypes", thumbnail = urlparse.urljoin(get_thumbnail_path(preferred_thumb),"thumb_canales.png"),viewmode="movie") )
     #itemlist.append( Item(title=config.get_localized_string(30130) , channel="novedades" , action="mainlist", thumbnail = urlparse.urljoin(get_thumbnail_path(preferred_thumb),"thumb_novedades.png"),viewmode="movie") )
     #itemlist.append( Item(title=config.get_localized_string(30118) , channel="channelselector" , action="channeltypes", thumbnail = urlparse.urljoin(get_thumbnail_path(preferred_thumb),"thumb_canales.png"),viewmode="movie") )
@@ -75,10 +75,9 @@ def getchanneltypes(preferred_thumb=""):
     logger.info("channelselector getchanneltypes")
 
     # Lista de categorias
-    valid_types = ["top channels", "movie", "serie", "anime", "saghe", "documentary", "vos", "torrent"]
-    dict_cat_lang = {'movie': config.get_localized_string(30122), 'serie': config.get_localized_string(30123),
-                     'anime': config.get_localized_string(30124), 'documentary': config.get_localized_string(30125),
-                     'vos': config.get_localized_string(30136), 'torrent': 'Torrent', 'saghe': 'Saghe', 'top channels': 'Top Channels'}
+    valid_types = ["anime", "documentary", "vos", "torrent"]
+    dict_cat_lang = {'anime': config.get_localized_string(30124), 'documentary': config.get_localized_string(30125),
+                     'vos': config.get_localized_string(30136), 'torrent': 'Torrent'}
 
     # Lee la lista de canales
     channel_path = os.path.join(config.get_runtime_path(), "channels", '*.xml')
@@ -123,9 +122,18 @@ def getchanneltypes(preferred_thumb=""):
     # Ahora construye el itemlist ordenadamente
     itemlist = list()
 
-    itemlist.append(Item(title=config.get_localized_string(30121), channel="channelselector", action="listchannels",
-                         category="all", thumbnail=urlparse.urljoin(get_thumbnail_path(preferred_thumb),
-                                                                    "thumb_canales_todos.png"), viewmode="movie"))
+    itemlist.append(Item(title="Top Channels", channel="channelselector", action="listchannels",
+                         category="top channels", thumbnail=urlparse.urljoin(get_thumbnail_path(preferred_thumb),
+                                                                    "thumb_canales_topchannels.png"), viewmode="movie"))
+    itemlist.append(Item(title=config.get_localized_string(30122), channel="channelselector", action="listchannels",
+                         category="movie", thumbnail=urlparse.urljoin(get_thumbnail_path(preferred_thumb),
+                                                                    "thumb_canales_peliculas.png"), viewmode="movie"))
+    itemlist.append(Item(title=config.get_localized_string(30123), channel="channelselector", action="listchannels",
+                         category="serie", thumbnail=urlparse.urljoin(get_thumbnail_path(preferred_thumb),
+                                                                    "thumb_canales_series.png"), viewmode="movie"))
+    itemlist.append(Item(title="Saghe", channel="saghe", action="mainlist",
+                         category="saghe", thumbnail=urlparse.urljoin(get_thumbnail_path(preferred_thumb),
+                                                                    "thumb_canales.png"), viewmode="movie"))
     logger.info("channelselector.getchanneltypes Ordenados:")
     for channel_type in valid_types:
         logger.info("channelselector.getchanneltypes channel_type="+channel_type)
