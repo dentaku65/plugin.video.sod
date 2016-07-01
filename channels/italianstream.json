@@ -6,7 +6,8 @@
         "adult": false,
         "category": [
                      "movie",
-                     "serie"
+                     "serie",
+                     "vos"
                     ],
         "language": "it",
         "thumbnail": "https://raw.githubusercontent.com/Zanzibar82/images/master/posters/italianstream.png",

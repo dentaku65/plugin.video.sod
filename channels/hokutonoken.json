@@ -5,7 +5,8 @@
         "active": true,
         "adult": false,
         "category": [
-                     "saghe"
+                     "saghe",
+                     "anime"
                     ],
         "language": "it",
         "thumbnail": "http://i.imgur.com/dn9ImTf.jpg",

@@ -5,7 +5,8 @@
         "active": true,
         "adult": false,
         "category": [
-                     "movie"
+                     "movie",
+                     "vos"
                     ],
         "language": "it",
         "thumbnail": "http://www.filmissimi.net/wp-content/uploads/2015/10/Logo3.png",

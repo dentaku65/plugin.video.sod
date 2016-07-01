@@ -5,7 +5,8 @@
         "active": true,
         "adult": false,
         "category": [
-                     "movie"
+                     "movie",
+                     "vos"
                     ],
         "language": "it",
         "thumbnail": "http://i.imgur.com/4mt0Df1.png",
