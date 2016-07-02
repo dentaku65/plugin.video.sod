@@ -95,8 +95,7 @@ def dettaglio(item):
 
     itemlist =[]
     episodio=1
-    patron='<tr[^<]+<[^<]+<strong>(.*?)</strong></td>[^<]+<[^<]+<.*?href="http://adf.ly.*?http://(.*?)"'
-    #patron = '<tr[^<]+<[^<]+<strong>(.*?)</strong></td>[^<]+<[^<]+<[^<]+<img[^<]+<[^<]+[^>]+>[^<]+<td[^<]+<a href="http.*?http://(.*?)"[^<]+<img[^<]+</a></td>[^<]+</tr>'
+    patron='<tr[^<]+?<[^<]+?<strong>(.*?)</strong></td>[^<]+?<[^<]+?<.*?href="http://.*?http://([^"]+?)"'
     scrapedAll(item.url, patron)
     for scrapedtitle,scrapedurl in scrapedAll(item.url, patron):
         title= "Episodio "+ str(episodio)
