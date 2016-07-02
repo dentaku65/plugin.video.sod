@@ -9,6 +9,7 @@ import time
 import urllib2
 import urlparse
 
+from core import config
 from core import logger
 from core import scrapertools
 from core.item import Item
@@ -236,7 +237,7 @@ def categorias(item):
 
 
 def episodios(item):
-    logger.info("anime sub ita - episodianime")
+    logger.info("streamondemand.casacinema episodios")
 
     itemlist = []
 
@@ -248,7 +249,6 @@ def episodios(item):
 
     for scrapedtitle, scrapedurl, scrapedserver in matches:
         scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
-        scrapedurl = scrapertools.decodeHtmlentities(scrapedurl)
         if scrapedtitle.startswith("<p>"):
             scrapedtitle = scrapedtitle[3:]
 
@@ -258,15 +258,31 @@ def episodios(item):
                  title="[COLOR red]" + scrapedtitle + " [/COLOR]" + "[COLOR azure]" + item.fulltitle + " [/COLOR]" + "[COLOR orange] [" + scrapedserver + "][/COLOR]",
                  url=scrapedurl,
                  thumbnail=item.thumbnail,
-                 fulltitle=item.fulltitle,
+                 fulltitle=item.show + ' | ' + scrapedtitle,
                  extra=item.extra,
+                 show=item.show))
+
+    if config.get_library_support() and len(itemlist) != 0:
+        itemlist.append(
+            Item(channel=__channel__,
+                 title=item.title,
+                 url=item.url,
+                 action="add_serie_to_library",
+                 extra="episodios" + "###" + item.extra,
+                 show=item.show))
+        itemlist.append(
+            Item(channel=item.channel,
+                 title="Scarica tutti gli episodi della serie",
+                 url=item.url,
+                 action="download_all_episodes",
+                 extra="episodios" + "###" + item.extra,
                  show=item.show))
 
     return itemlist
 
 
 def findvideos(item):
-    logger.info("[launcher.py] findvideos")
+    logger.info("streamondemand.casacinema findvideos")
 
     data = item.url if item.extra == 'serie' else scrapertools.cache_page(item.url, headers=headers)
 
