@@ -200,9 +200,12 @@ def categoria(item):
 def episodios(item):
     itemlist = []
 
+    patron = 'class="episodio">\s*<.*?href=([^>]+)><img.*?src=(.*?)width[^<]+<[^<]+<[^<]+<[^<]+<.*?>(.*?)</a>'
+    patronvideos = '<a id="nav" href="([^"]+)">></a>'
+
     url = urlparse.urljoin(host, item.url)
+
     while True:
-        patron = 'class="episodio">\s*<.*?href=([^>]+)><img.*?src=(.*?)width[^<]+<[^<]+<[^<]+<[^<]+<.*?>(.*?)</a>'
         for scrapedurl, scrapedthumbnail, scrapedtitle in scrapedAll(url, patron):
             if DEBUG: logger.info(
                 "scrapedurl: " + scrapedurl + " scrapedthumbnail: " + scrapedthumbnail + " scrapedtitle:" + scrapedtitle)
@@ -213,12 +216,11 @@ def episodios(item):
                      title=scrapedtitle,
                      url=scrapedurl,
                      thumbnail=urlparse.urljoin(host, scrapedthumbnail),
-                     fulltitle=scrapedtitle,
-                     show=scrapedtitle,
+                     fulltitle=item.show + ' | ' + scrapedtitle,
+                     show=item.show,
                      fanart=urlparse.urljoin(host, scrapedthumbnail)))
 
         data = scrapertools.cache_page(urlparse.urljoin(host, item.url))
-        patronvideos = '<a id="nav" href="([^"]+)">></a>'
         matches = re.compile(patronvideos, re.DOTALL).findall(data)
 
         if len(matches) > 0:
