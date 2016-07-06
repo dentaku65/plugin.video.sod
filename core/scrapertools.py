@@ -16,16 +16,19 @@
 # Historial de cambios:
 #------------------------------------------------------------
 
-import urlparse,urllib2,urllib
-import time
-import os
-import config
-import logger
-import re
-import downloadtools
-import socket
 import StringIO
 import gzip
+import os
+import re
+import socket
+import time
+import urllib
+import urllib2
+import urlparse
+
+import config
+import downloadtools
+import logger
 
 # True - Muestra las cabeceras HTTP en el log
 # False - No las muestra
@@ -729,8 +732,7 @@ def downloadpageGzip(url):
 
     #txheaders =  {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3',
     #              'Referer':'http://www.megavideo.com/?s=signup'}
-    
-    import httplib
+
     parsedurl = urlparse.urlparse(url)
     logger.info("parsedurl="+str(parsedurl))
         
@@ -1530,3 +1532,46 @@ def wait_for_internet(wait=30, retry=5):
         if count >= retry:
             return False
         time.sleep(wait)
+
+
+def parseJSString(s):
+    try:
+        offset = 1 if s[0] == '+' else 0
+        val = int(eval(s.replace('!+[]', '1').replace('!![]', '1').replace('[]', '0').replace('(', 'str(')[offset:]))
+        return val
+    except:
+        pass
+
+
+def anti_cloudflare(url, headers):
+    result = cache_page(url, headers=headers)
+    try:
+        jschl = re.compile('name="jschl_vc" value="(.+?)"/>').findall(result)[0]
+        init = re.compile('setTimeout\(function\(\){\s*.*?.*:(.*?)};').findall(result)[0]
+        builder = re.compile(r"challenge-form\'\);\s*(.*)a.v").findall(result)[0]
+        decrypt_val = parseJSString(init)
+        lines = builder.split(';')
+
+        for line in lines:
+            if len(line) > 0 and '=' in line:
+                sections = line.split('=')
+                line_val = parseJSString(sections[1])
+                decrypt_val = int(eval(str(decrypt_val) + sections[0][-1] + str(line_val)))
+
+        urlsplit = urlparse.urlsplit(url)
+        h = urlsplit.netloc
+        s = urlsplit.scheme
+
+        answer = decrypt_val + len(h)
+
+        query = '%s/cdn-cgi/l/chk_jschl?jschl_vc=%s&jschl_answer=%s' % (url, jschl, answer)
+
+        if 'type="hidden" name="pass"' in result:
+            passval = re.compile('name="pass" value="(.*?)"').findall(result)[0]
+            query = '%s/cdn-cgi/l/chk_jschl?pass=%s&jschl_vc=%s&jschl_answer=%s' % (s + '://' + h, urllib.quote_plus(passval), jschl, answer)
+            time.sleep(5)
+
+        get_headers_from_response(query, headers=headers)
+        return cache_page(url, headers=headers)
+    except:
+        return result

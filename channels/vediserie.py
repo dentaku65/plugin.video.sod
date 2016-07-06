@@ -5,9 +5,6 @@
 # http://blog.tvalacarta.info/plugin-xbmc/streamondemand.
 # ------------------------------------------------------------
 import re
-import time
-import urllib2
-import urlparse
 
 from core import config
 from core import logger
@@ -75,7 +72,7 @@ def list_a_z(item):
     logger.info("[vediserie.py] ordine alfabetico")
     itemlist = []
 
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     patron = '<li><a href="([^"]+)" title="([^"]+)">.*?</a></li>'
 
@@ -95,7 +92,7 @@ def fichas(item):
     logger.info("[vediserie.py] fichas")
     itemlist = []
 
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     # ------------------------------------------------
     cookies = ""
@@ -149,7 +146,7 @@ def episodios(item):
     itemlist = []
 
     # Descarga la página
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     patron = r'<div class="list" data-stagione="([^"]+)">\s*'
     patron += r'<ul class="listEpis">\s*'
@@ -207,23 +204,3 @@ def findvid_serie(item):
         videoitem.channel = __channel__
 
     return itemlist
-
-
-def anti_cloudflare(url):
-    # global headers
-
-    try:
-        resp_headers = scrapertools.get_headers_from_response(url, headers=headers)
-        resp_headers = dict(resp_headers)
-    except urllib2.HTTPError, e:
-        resp_headers = e.headers
-
-    if 'refresh' in resp_headers:
-        time.sleep(int(resp_headers['refresh'][:1]))
-
-        urlsplit = urlparse.urlsplit(url)
-        h = urlsplit.netloc
-        s = urlsplit.scheme
-        scrapertools.get_headers_from_response(s + '://' + h + "/" + resp_headers['refresh'][7:], headers=headers)
-
-    return scrapertools.cache_page(url, headers=headers)

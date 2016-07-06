@@ -5,8 +5,6 @@
 # http://blog.tvalacarta.info/plugin-xbmc/streamondemand.
 # ------------------------------------------------------------
 import re
-import time
-import urllib2
 import urlparse
 
 from core import config
@@ -106,7 +104,7 @@ def peliculas(item):
     itemlist = []
 
     # Descarga la pagina
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     # Extrae las entradas (carpetas)
     patron = '<div class="box-single-movies">\s*'
@@ -160,7 +158,7 @@ def peliculas_tv(item):
     itemlist = []
 
     # Descarga la pagina
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     # Extrae las entradas (carpetas)
     patron = '<div class="box-single-movies">\s*'
@@ -218,7 +216,7 @@ def categorias(item):
 
     itemlist = []
 
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     # The categories are the options for the combo
     patron = '<div class="col-xs-6[^=]+="Categoria"[^>]+>[^=]+="(.*?)">(.*?)</a>'
@@ -242,7 +240,7 @@ def episodios(item):
     itemlist = []
 
     # Downloads page
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
     # Extracts the entries
     patron = '(.*?)<a href="(.*?)" target="_blank" rel="nofollow".*?>(.*?)</a>'
     matches = re.compile(patron).findall(data)
@@ -296,23 +294,3 @@ def findvideos(item):
         videoitem.channel = __channel__
 
     return itemlist
-
-
-def anti_cloudflare(url):
-    # global headers
-
-    try:
-        resp_headers = scrapertools.get_headers_from_response(url, headers=headers)
-        resp_headers = dict(resp_headers)
-    except urllib2.HTTPError, e:
-        resp_headers = e.headers
-
-    if 'refresh' in resp_headers:
-        time.sleep(int(resp_headers['refresh'][:1]))
-
-        urlsplit = urlparse.urlsplit(url)
-        h = urlsplit.netloc
-        s = urlsplit.scheme
-        scrapertools.get_headers_from_response(s + '://' + h + "/" + resp_headers['refresh'][7:], headers=headers)
-
-    return scrapertools.cache_page(url, headers=headers)

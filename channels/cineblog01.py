@@ -5,8 +5,6 @@
 # http://blog.tvalacarta.info/plugin-xbmc/streamondemand.
 # ------------------------------------------------------------
 import re
-import time
-import urllib2
 import urlparse
 
 from core import config
@@ -130,7 +128,7 @@ def peliculas(item):
 
     # Descarga la página
     # data = scrapertools.cache_page(item.url)
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     # Extrae las entradas (carpetas)
     patronvideos = '<div class="span4".*?<a.*?<p><img src="([^"]+)".*?'
@@ -196,7 +194,7 @@ def menugeneros(item):
     logger.info("[cineblog01.py] menugeneros")
     itemlist = []
 
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     # Narrow search by selecting only the combo
     bloque = scrapertools.get_match(data, '<select name="select2"(.*?)</select>')
@@ -229,7 +227,7 @@ def menuhd(item):
     logger.info("[cineblog01.py] menugeneros")
     itemlist = []
 
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     # Narrow search by selecting only the combo
     bloque = scrapertools.get_match(data, '<select name="select1"(.*?)</select>')
@@ -262,7 +260,7 @@ def menuanyos(item):
     logger.info("[cineblog01.py] menuvk")
     itemlist = []
 
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     # Narrow search by selecting only the combo
     bloque = scrapertools.get_match(data, '<select name="select3"(.*?)</select>')
@@ -320,7 +318,7 @@ def listserie(item):
     itemlist = []
 
     # Descarga la página
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     # Extrae las entradas (carpetas)
     patronvideos = '<div class="span4">\s*<a href="([^"]+)"><img src="([^"]+)".*?<div class="span8">.*?<h1>([^<]+)</h1></a>(.*?)<br><a'
@@ -370,7 +368,7 @@ def listaaz(item):
     logger.info("[cineblog01.py] listaaz")
     itemlist = []
 
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     # Narrow search by selecting only the combo
     patron = '<a href="#char_5a" title="Go to the letter Z">Z</a></span></div>(.*?)</ul></div><div style="clear:both;"></div></div>'
@@ -405,7 +403,7 @@ def listaletra(item):
     logger.info("[cineblog01.py] listaaz")
     itemlist = []
 
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     # Narrow search by selecting only the combo
     bloque = scrapertools.get_match(data, '<option value=\'-1\'>Anime per Lettera</option>(.*?)</select>')
@@ -437,7 +435,7 @@ def animegenere(item):
     logger.info("[cineblog01.py] animegenere")
     itemlist = []
 
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     # Narrow search by selecting only the combo
     bloque = scrapertools.get_match(data, '<select name="select2"(.*?)</select>')
@@ -466,7 +464,7 @@ def listanime(item):
     itemlist = []
 
     # Descarga la página
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     ## ------------------------------------------------
     cookies = ""
@@ -589,7 +587,7 @@ def episodios_serie(item):
     itemlist = []
 
     ## Descarga la página
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     start = data.find('<td bgcolor="#ECEAE1">')
     end = data.find('</td>', start)
@@ -643,7 +641,7 @@ def episodios_anime(item):
     itemlist = []
 
     # Descarga la página
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
     data = scrapertools.decodeHtmlentities(data).replace('http://cineblog01.pw', 'http://k4pp4.pw')
 
     patron1 = '(?:<p>|<td bgcolor="#ECEAE1">)<span class="txt_dow">(.*?)(?:</p>)?(?:\s*</span>)?\s*</td>'
@@ -689,7 +687,7 @@ def findvid_film(item):
     itemlist = []
 
     ## Descarga la página
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
     data = scrapertools.decodeHtmlentities(data).replace('http://cineblog01.pw', 'http://k4pp4.pw')
 
     ## Extract the quality format
@@ -843,7 +841,7 @@ def play(item):
 
     print "##############################################################"
     if "go.php" in item.url:
-        data = anti_cloudflare(item.url)
+        data = scrapertools.anti_cloudflare(item.url, headers)
         try:
             data = scrapertools.get_match(data, 'window.location.href = "([^"]+)";')
         except IndexError:
@@ -854,7 +852,7 @@ def play(item):
             data = scrapertools.get_header_from_response(data, headers=headers, header_to_get="Location")
         print "##### play go.php data ##\n%s\n##" % data
     elif "/link/" in item.url:
-        data = anti_cloudflare(item.url)
+        data = scrapertools.anti_cloudflare(item.url, headers)
         from core import jsunpack
 
         try:
@@ -882,26 +880,6 @@ def play(item):
         videoitem.channel = __channel__
 
     return itemlist
-
-
-def anti_cloudflare(url):
-    # global headers
-
-    try:
-        resp_headers = scrapertools.get_headers_from_response(url, headers=headers)
-        resp_headers = dict(resp_headers)
-    except urllib2.HTTPError, e:
-        resp_headers = e.headers
-
-    if 'refresh' in resp_headers:
-        time.sleep(int(resp_headers['refresh'][:1]))
-
-        urlsplit = urlparse.urlsplit(url)
-        h = urlsplit.netloc
-        s = urlsplit.scheme
-        scrapertools.get_headers_from_response(s + '://' + h + "/" + resp_headers['refresh'][7:], headers=headers)
-
-    return scrapertools.cache_page(url, headers=headers)
 
 
 def HomePage(item):

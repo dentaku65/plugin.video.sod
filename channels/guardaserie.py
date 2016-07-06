@@ -5,8 +5,6 @@
 # http://blog.tvalacarta.info/plugin-xbmc/streamondemand.
 # ------------------------------------------------------------
 import re
-import time
-import urllib2
 import urlparse
 
 from core import config
@@ -97,7 +95,7 @@ def fichas(item):
     data = re.sub(
         r'\t|\n|\r',
         '',
-        anti_cloudflare(item.url)
+        scrapertools.anti_cloudflare(item.url, headers)
     )
 
     data = scrapertools.find_single_match(data, '<a[^>]+>Serie Tv</a><ul>(.*?)</ul>')
@@ -129,7 +127,7 @@ def ultimi(item):
     data = re.sub(
         r'\t|\n|\r',
         '',
-        anti_cloudflare(item.url)
+        scrapertools.anti_cloudflare(item.url, headers)
     )
     # data = scrapertools.cache_page(item.url)
     patron = '<p>Nuove Puntate delle SERIE TV, Aggiunte OGGI:</p>(.*?)<div id="disclamer">'
@@ -167,7 +165,7 @@ def anime(item):
     data = re.sub(
         r'\t|\n|\r',
         '',
-        anti_cloudflare(item.url)
+        scrapertools.anti_cloudflare(item.url, headers)
     )
 
     data = scrapertools.find_single_match(data, '<a[^>]+>Anime</a><ul>(.*?)</ul>')
@@ -200,7 +198,7 @@ def cartoni(item):
     data = re.sub(
         r'\t|\n|\r',
         '',
-        anti_cloudflare(item.url)
+        scrapertools.anti_cloudflare(item.url, headers)
     )
 
     data = scrapertools.find_single_match(data, '<a[^>]+>Cartoni</a><ul>(.*?)</ul>')
@@ -233,7 +231,7 @@ def progs(item):
     data = re.sub(
         r'\t|\n|\r',
         '',
-        anti_cloudflare(item.url)
+        scrapertools.anti_cloudflare(item.url, headers)
     )
 
     data = scrapertools.find_single_match(data, '<a[^>]+>Programmi TV</a><ul>(.*?)</ul>')
@@ -266,7 +264,7 @@ def cerca(item):
     data = re.sub(
         r'\t|\n|\r',
         '',
-        anti_cloudflare(item.url)
+        scrapertools.anti_cloudflare(item.url, headers)
     )
 
     patron = '<div class="search_thumbnail">.*?<a class="search_link" href="([^"]+)" rel="bookmark" title="([^"]+)">.*?<img src="([^"]+)" />.*?</a>'
@@ -302,7 +300,7 @@ def episodios(item):
     data = re.sub(
         r'\t|\n|\r',
         '',
-        anti_cloudflare(item.url)
+        scrapertools.anti_cloudflare(item.url, headers)
     )
 
     serie_id = scrapertools.get_match(data, '/?id=(\d+)" rel="nofollow"')
@@ -386,23 +384,3 @@ def findvideos(item):
              folder=False))
 
     return itemlist
-
-
-def anti_cloudflare(url):
-    # global headers
-
-    try:
-        resp_headers = scrapertools.get_headers_from_response(url, headers=headers)
-        resp_headers = dict(resp_headers)
-    except urllib2.HTTPError, e:
-        resp_headers = e.headers
-
-    if 'refresh' in resp_headers:
-        time.sleep(int(resp_headers['refresh'][:1]))
-
-        urlsplit = urlparse.urlsplit(url)
-        h = urlsplit.netloc
-        s = urlsplit.scheme
-        scrapertools.get_headers_from_response(s + '://' + h + "/" + resp_headers['refresh'][7:], headers=headers)
-
-    return scrapertools.cache_page(url, headers=headers)

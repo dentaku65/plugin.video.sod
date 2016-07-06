@@ -5,8 +5,6 @@
 # http://www.mimediacenter.info/foro/viewforum.php?f=36
 # ------------------------------------------------------------
 import re
-import time
-import urllib2
 import urlparse
 
 from core import config
@@ -70,7 +68,7 @@ def peliculas(item):
     # Descarga la pagina
     # data = scrapertools.cache_page(item.url)
 
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     ## ------------------------------------------------
     cookies = ""
@@ -137,7 +135,7 @@ def categorias(item):
     itemlist = []
 
     # data = scrapertools.cache_page(item.url)
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     # Narrow search by selecting only the combo
     bloque = scrapertools.get_match(data, '<ul class="kategori_list">(.*?)</ul>')
@@ -181,7 +179,7 @@ def findvideos(item):
     logger.info("[altadefinizione01.py] findvideos")
 
     # Descarga la página
-    data = anti_cloudflare(item.url)
+    data = scrapertools.anti_cloudflare(item.url, headers)
 
     itemlist = servertools.find_video_items(data=data)
 
@@ -193,23 +191,3 @@ def findvideos(item):
         videoitem.channel = __channel__
 
     return itemlist
-
-
-def anti_cloudflare(url):
-    # global headers
-
-    try:
-        resp_headers = scrapertools.get_headers_from_response(url, headers=headers)
-        resp_headers = dict(resp_headers)
-    except urllib2.HTTPError, e:
-        resp_headers = e.headers
-
-    if 'refresh' in resp_headers:
-        time.sleep(int(resp_headers['refresh'][:1]))
-
-        urlsplit = urlparse.urlsplit(url)
-        h = urlsplit.netloc
-        s = urlsplit.scheme
-        scrapertools.get_headers_from_response(s + '://' + h + "/" + resp_headers['refresh'][7:], headers=headers)
-
-    return scrapertools.cache_page(url, headers=headers)
