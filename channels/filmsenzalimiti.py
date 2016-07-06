@@ -35,20 +35,24 @@ def mainlist(item):
     itemlist = [Item(channel=__channel__,
                      title="[COLOR azure]Film Del Cinema[/COLOR]",
                      action="novedades",
+                     extra="film",
                      url="%s/genere/film" % host,
                      thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
                 Item(channel=__channel__,
                      title="[COLOR azure]Film Dvdrip[/COLOR]",
                      action="novedades",
+                     extra="film",
                      url="%s/genere/dvd-rip" % host,
                      thumbnail="http://repository-butchabay.googlecode.com/svn/branches/eden/skin.cirrus.extended.v2/extras/moviegenres/Box%20Sets%20HD.png"),
                 Item(channel=__channel__,
                      title="[COLOR azure]Film Sub Ita[/COLOR]",
                      action="novedades",
+                     extra="film",
                      url="%s/genere/subita" % host,
                      thumbnail="http://i.imgur.com/qUENzxl.png"),
                 Item(channel=__channel__,
                      action="search",
+                     extra="film",
                      title="[COLOR yellow]Cerca...[/COLOR]",
                      thumbnail="http://dc467.4shared.com/img/fEbJqOum/s7/13feaf0c8c0/Search"),
                 Item(channel=__channel__,
@@ -87,6 +91,7 @@ def categorias(item):
                  url=scrapedurl,
                  thumbnail=scrapedthumbnail,
                  plot=scrapedplot,
+                 extra=item.extra,
                  folder=True))
 
     return itemlist
@@ -96,10 +101,10 @@ def search(item, texto):
     logger.info("[filmsenzalimiti.py] " + item.url + " search " + texto)
     item.url = host + "/?s=" + texto
     try:
+        if item.extra == "film":
+            return novedades(item)
         if item.extra == "serie":
             return novedades_tv(item)
-        else:
-            return novedades(item)
     # Se captura la excepción, para no interrumpir al buscador global si un canal falla
     except:
         import sys
@@ -132,24 +137,25 @@ def novedades(item):
             "title=[" + scrapedtitle + "], url=[" + scrapedurl + "], thumbnail=[" + scrapedthumbnail + "]")
         itemlist.append(infoSod(
             Item(channel=__channel__,
-                 action="episodios" if item.extra == "serie" else "findvideos",
+                 action="findvideos",
                  fulltitle=scrapedtitle,
                  show=scrapedtitle,
                  title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
                  url=scrapedurl,
                  thumbnail=scrapedthumbnail,
                  plot=scrapedplot,
+                 extra=item.extra,
                  folder=True), tipo='movie'))
 
     try:
         next_page = scrapertools.get_match(data, 'class="nextpostslink" rel="next" href="([^"]+)"')
         itemlist.append(
             Item(channel=__channel__,
-                 extra=item.extra,
                  action="novedades",
                  title="[COLOR orange]Successivo >>[/COLOR]",
                  url=next_page,
                  thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png",
+                 extra=item.extra,
                  folder=True))
     except:
         pass
@@ -181,24 +187,25 @@ def novedades_tv(item):
             "title=[" + scrapedtitle + "], url=[" + scrapedurl + "], thumbnail=[" + scrapedthumbnail + "]")
         itemlist.append(infoSod(
             Item(channel=__channel__,
-                 action="episodios" if item.extra == "serie" else "findvideos",
+                 action="episodios",
                  fulltitle=scrapedtitle,
                  show=scrapedtitle,
                  title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
                  url=scrapedurl,
                  thumbnail=scrapedthumbnail,
                  plot=scrapedplot,
+                 extra=item.extra,
                  folder=True), tipo='tv'))
 
     try:
         next_page = scrapertools.get_match(data, 'class="nextpostslink" rel="next" href="([^"]+)"')
         itemlist.append(
             Item(channel=__channel__,
-                 extra=item.extra,
                  action="novedades_tv",
                  title="[COLOR orange]Successivo >>[/COLOR]",
                  url=next_page,
                  thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png",
+                 extra=item.extra,
                  folder=True))
     except:
         pass
@@ -217,11 +224,11 @@ def episodios(item):
             if scrapedtitle != 'Categorie':
                 itemlist.append(
                     Item(channel=__channel__,
-                         action="findvid_serie",
+                         action="findvideos",
                          title="[COLOR azure]%s[/COLOR]" % (scrapedtitle + " (" + lang_title + ")"),
-                         url=item.url,
+                         url=data,
                          thumbnail=item.thumbnail,
-                         extra=data,
+                         extra=item.extra,
                          fulltitle=item.fulltitle,
                          show=item.show))
 
@@ -263,24 +270,24 @@ def episodios(item):
                  title=item.title,
                  url=item.url,
                  action="add_serie_to_library",
-                 extra="episodios",
+                 extra="episodios" + "###" + item.extra,
                  show=item.show))
         itemlist.append(
             Item(channel=__channel__,
                  title="Scarica tutti gli episodi della serie",
                  url=item.url,
                  action="download_all_episodes",
-                 extra="episodios",
+                 extra="episodios" + "###" + item.extra,
                  show=item.show))
 
     return itemlist
 
 
-def findvid_serie(item):
+def findvideos(item):
     logger.info("[filmsenzalimiti.py] findvideos")
 
     # Descarga la página
-    data = item.extra
+    data = item.url if item.extra == 'serie' else scrapertools.cache_page(item.url)
 
     itemlist = servertools.find_video_items(data=data)
 
