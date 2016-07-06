@@ -98,8 +98,14 @@ def tvoggi(item):
         if (DEBUG): logger.info("title=[" + scrapedtitle + "], url=[" + scrapedurl + "]")
 
         itemlist.append(infoSod(
-            Item(channel=__channel__, action="do_search", title=scrapedtitle, fulltitle=scrapedtitle, url=scrapedurl,
-                 thumbnail=scrapedthumbnail), tipo="movie"))
+            Item(channel=__channel__,
+                 action="do_search",
+                 extra=titolo,
+                 title=scrapedtitle + "[COLOR yellow]   " + scrapedtv + "[/COLOR]",
+                 fulltitle=scrapedtitle,
+                 url=scrapedurl,
+                 thumbnail=scrapedthumbnail,
+                 folder=True), tipo="movie"))
 
     return itemlist
 
