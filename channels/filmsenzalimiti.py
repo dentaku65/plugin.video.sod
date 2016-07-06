@@ -229,7 +229,7 @@ def episodios(item):
                          url=data,
                          thumbnail=item.thumbnail,
                          extra=item.extra,
-                         fulltitle=item.fulltitle,
+                         fulltitle=item.show + ' | ' + item.fulltitle,
                          show=item.show))
 
     logger.info("[filmsenzalimiti.py] episodios")
