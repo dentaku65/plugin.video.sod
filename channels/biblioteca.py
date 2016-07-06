@@ -268,29 +268,30 @@ def search_tvshow_by_title(item, search_terms):
     logger.info("streamondemand.channels.database search_tvshow_by_title '%s'" % (search_terms))
 
     return list_movie(
-            Item(channel=item.channel,
-                 url='search/tv?query=%s&' % url_quote_plus(search_terms),
-                 plot="1",
-                 type="serie"))
+        Item(channel=item.channel,
+             url='search/tv?query=%s&' % url_quote_plus(search_terms),
+             plot="1",
+             type="serie"))
 
 
 def search_movie_by_title(item, search_terms):
     logger.info("streamondemand.channels.database search_movie_by_title '%s'" % (search_terms))
 
     return list_movie(
-            Item(channel=item.channel,
-                 url='search/movie?query=%s&' % url_quote_plus(search_terms),
-                 plot="1"))
+        Item(channel=item.channel,
+             url='search/movie?query=%s&' % url_quote_plus(search_terms),
+             plot="1",
+             type="film"))
 
 
 def search_similar_movie_by_title(item, search_terms):
     logger.info("streamondemand.channels.database search_movie_by_title '%s'" % (search_terms))
 
     return list_movie(
-            Item(channel=item.channel,
-                 url='search/movie?append_to_response=similar_movies,alternative_title&query=%s&' % url_quote_plus(
-                         search_terms),
-                 plot="1"))
+        Item(channel=item.channel,
+             url='search/movie?append_to_response=similar_movies,alternative_title&query=%s&' % url_quote_plus(search_terms),
+             plot="1",
+             type='film'))
 
 
 def search_movie_by_year(item, search_terms):
@@ -300,10 +301,11 @@ def search_movie_by_year(item, search_terms):
     result = []
     if len(year) == 4:
         result.extend(
-                list_movie(
-                        Item(channel=item.channel,
-                             url='discover/movie?primary_release_year=%s&' % year,
-                             plot="1")))
+            list_movie(
+                Item(channel=item.channel,
+                     url='discover/movie?primary_release_year=%s&' % year,
+                     plot="1",
+                     type="film")))
     return result
 
 
@@ -334,6 +336,7 @@ def search_person_by_name(item, search_terms):
                 thumbnail=poster,
                 viewmode='list',
                 fanart=fanart,
+                type='film'
                 # extracmds=extracmds
         ))
 
@@ -380,6 +383,7 @@ def search_collection_by_name(item, search_terms):
                 thumbnail=poster,
                 viewmode='list',
                 fanart=fanart,
+                type='film'
         ))
 
     return itemlist
