@@ -22,7 +22,7 @@ __channel__ = "buscador"
 
 logger.info("streamondemand.channels.buscador init")
 
-DEBUG = True
+DEBUG = config.get_setting("debug")
 
 TIMEOUT_TOTAL = 90
 
