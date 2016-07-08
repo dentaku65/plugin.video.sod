@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <channel>
-	<id>cineblog01</id>
-	<name>Cineblog01</name>
+	<id>cb01anime</id>
+	<name>Cb01anime</name>
 
 	<active>true</active>
 	<adult>false</adult>
@@ -17,9 +17,7 @@
 	<changes>update</changes>
 
 	<categories>
-		<category>movie</category>
-                <category>serie</category>
-		<category>top channels</category>
+		<category>anime</category>
 	</categories>
 
 	<settings>

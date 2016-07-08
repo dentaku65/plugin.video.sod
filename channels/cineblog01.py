@@ -21,7 +21,6 @@ __title__ = "CineBlog 01"
 __language__ = "IT"
 
 sito = "http://www.cb01.co"
-sitoanime = "http://www.cineblog01.cc"
 
 headers = [
     ['User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:38.0) Gecko/20100101 Firefox/38.0'],
@@ -85,35 +84,6 @@ def mainlist(item):
                      action="search",
                      title="[COLOR yellow]Cerca Serie Tv[/COLOR]",
                      extra="serie",
-                     thumbnail="http://dc467.4shared.com/img/fEbJqOum/s7/13feaf0c8c0/Search"),
-                Item(channel=__channel__,
-                     action="listanime",
-                     title="[COLOR azure]Anime - Novita'[/COLOR]",
-                     url="%s/anime/" % sitoanime,
-                     extra="anime",
-                     thumbnail="http://orig09.deviantart.net/df5a/f/2014/169/2/a/fist_of_the_north_star_folder_icon_by_minacsky_saya-d7mq8c8.png"),
-                Item(channel=__channel__,
-                     action="animegenere",
-                     title="[COLOR azure]Anime - Per Genere[/COLOR]",
-                     url="%s/anime/" % sitoanime,
-                     extra="anime",
-                     thumbnail="http://xbmc-repo-ackbarr.googlecode.com/svn/trunk/dev/skin.cirrus%20extended%20v2/extras/moviegenres/Genres.png"),
-                Item(channel=__channel__,
-                     action="listaletra",
-                     title="[COLOR azure]Anime - Per Lettera A-Z[/COLOR]",
-                     url="%s/anime/" % sitoanime,
-                     extra="anime",
-                     thumbnail="http://i.imgur.com/IjCmx5r.png"),
-                Item(channel=__channel__,
-                     action="listaaz",
-                     title="[COLOR azure]Anime - Lista Completa[/COLOR]",
-                     url="%s/anime/lista-completa-anime-cartoon/" % sitoanime,
-                     extra="anime",
-                     thumbnail="http://i.imgur.com/IjCmx5r.png"),
-                Item(channel=__channel__,
-                     action="search",
-                     title="[COLOR yellow]Cerca Anime[/COLOR]",
-                     extra="anime",
                      thumbnail="http://dc467.4shared.com/img/fEbJqOum/s7/13feaf0c8c0/Search")]
 
     return itemlist
@@ -298,9 +268,6 @@ def search(item, texto):
         if item.extra == "serie":
             item.url = "http://www.cb01.co/serietv/?s=" + texto
             return listserie(item)
-        if item.extra == "anime":
-            item.url = "http://www.cineblog01.cc/anime/?s=" + texto
-            return listanime(item)
         if item.extra == "film":
             item.url = "http://www.cb01.co/?s=" + texto
             return peliculas(item)
@@ -399,145 +366,9 @@ def listaaz(item):
     return itemlist
 
 
-def listaletra(item):
-    logger.info("[cineblog01.py] listaaz")
-    itemlist = []
-
-    data = scrapertools.anti_cloudflare(item.url, headers)
-
-    # Narrow search by selecting only the combo
-    bloque = scrapertools.get_match(data, '<option value=\'-1\'>Anime per Lettera</option>(.*?)</select>')
-
-    # The categories are the options for the combo
-    patron = '<option value="([^"]+)">(\([^<]+)\)</option>'
-    matches = re.compile(patron, re.DOTALL).findall(bloque)
-    scrapertools.printMatches(matches)
-
-    for url, titulo in matches:
-        scrapedtitle = titulo
-        scrapedurl = url
-        scrapedthumbnail = ""
-        scrapedplot = ""
-        if (DEBUG): logger.info("title=[" + scrapedtitle + "], url=[" + scrapedurl + "]")
-        itemlist.append(
-            Item(channel=__channel__,
-                 action="listanime",
-                 title=scrapedtitle,
-                 url=sitoanime + scrapedurl,
-                 thumbnail="http://www.justforpastime.net/uploads/3/8/1/5/38155083/273372_orig.jpg",
-                 extra=item.extra,
-                 plot=scrapedplot))
-
-    return itemlist
-
-
-def animegenere(item):
-    logger.info("[cineblog01.py] animegenere")
-    itemlist = []
-
-    data = scrapertools.anti_cloudflare(item.url, headers)
-
-    # Narrow search by selecting only the combo
-    bloque = scrapertools.get_match(data, '<select name="select2"(.*?)</select>')
-
-    # The categories are the options for the combo
-    patron = '<option value="([^"]+)">([^<]+)</option>'
-    matches = re.compile(patron, re.DOTALL).findall(bloque)
-    scrapertools.printMatches(matches)
-
-    for scrapedurl, scrapedtitle in matches:
-        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
-        if DEBUG: logger.info(
-            "title=[" + scrapedtitle + "], url=[" + scrapedurl + "]")
-        itemlist.append(
-            Item(channel=__channel__,
-                 action="listanime",
-                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
-                 extra=item.extra,
-                 url=sitoanime + scrapedurl))
-
-    return itemlist
-
-
-def listanime(item):
-    logger.info("[cineblog01.py] mainlist")
-    itemlist = []
-
-    # Descarga la página
-    data = scrapertools.anti_cloudflare(item.url, headers)
-
-    ## ------------------------------------------------
-    cookies = ""
-    matches = re.compile('(.cineblog01.cc.*?)\n', re.DOTALL).findall(config.get_cookie_data())
-    for cookie in matches:
-        name = cookie.split('\t')[5]
-        value = cookie.split('\t')[6]
-        cookies += name + "=" + value + ";"
-    headers.append(['Cookie', cookies[:-1]])
-    import urllib
-    _headers = urllib.urlencode(dict(headers))
-    ## ------------------------------------------------
-
-    # Extrae las entradas (carpetas)
-    patronvideos = '<div class="span4"> <a.*?<img.*?src="(.*?)".*?'
-    patronvideos += '<div class="span8">.*?<a href="(.*?)">.*?'
-    patronvideos += '<h1>(.*?)</h1></a>.*?<br />(.*?)<br>.*?'
-    matches = re.compile(patronvideos, re.DOTALL).finditer(data)
-
-    for match in matches:
-        scrapedthumbnail = match.group(1)
-        scrapedurl = match.group(2)
-        scrapedtitle = scrapertools.unescape(match.group(3))
-        scrapedplot = scrapertools.unescape(match.group(4))
-        scrapedplot = scrapertools.decodeHtmlentities(scrapedplot)
-        if scrapedplot.startswith(""):
-            scrapedplot = scrapedplot[64:]
-        if DEBUG: logger.info(
-            "title=[" + scrapedtitle + "], url=[" + scrapedurl + "], thumbnail=[" + scrapedthumbnail + "]")
-
-        ## ------------------------------------------------
-        scrapedthumbnail += "|" + _headers
-        ## ------------------------------------------------
-
-        # Añade al listado de XBMC
-        itemlist.append(
-            Item(channel=__channel__,
-                 action="listaaz" if scrapedtitle == "Lista Alfabetica Completa Anime/Cartoon" else "episodios",
-                 fulltitle=scrapedtitle,
-                 show=scrapedtitle,
-                 title=scrapedtitle,
-                 url=scrapedurl,
-                 thumbnail=scrapedthumbnail,
-                 viewmode="movie_with_plot",
-                 extra=item.extra,
-                 plot=scrapedplot))
-
-    # Put the next page mark
-    try:
-        next_page = scrapertools.get_match(data, "<link rel='next' href='([^']+)'")
-        itemlist.append(
-            Item(channel=__channel__,
-                 action="HomePage",
-                 title="[COLOR yellow]Torna Home[/COLOR]",
-                 folder=True)),
-        itemlist.append(
-            Item(channel=__channel__,
-                 action="listanime",
-                 title="[COLOR orange]Successivo>>[/COLOR]",
-                 url=next_page,
-                 extra=item.extra,
-                 thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png"))
-    except:
-        pass
-
-    return itemlist
-
-
 def episodios(item):
     if item.extra == 'serie':
         itemlist = episodios_serie(item)
-    elif item.extra == 'anime':
-        itemlist = episodios_anime(item)
 
     if config.get_library_support() and len(itemlist) != 0:
         itemlist.append(
@@ -634,52 +465,11 @@ def episodios_serie(item):
 
     return itemlist
 
-
-def episodios_anime(item):
-    logger.info("[cineblog01.py] episodios")
-
-    itemlist = []
-
-    # Descarga la página
-    data = scrapertools.anti_cloudflare(item.url, headers)
-    data = scrapertools.decodeHtmlentities(data).replace('http://cineblog01.pw', 'http://k4pp4.pw')
-
-    patron1 = '(?:<p>|<td bgcolor="#ECEAE1">)<span class="txt_dow">(.*?)(?:</p>)?(?:\s*</span>)?\s*</td>'
-    patron2 = '<a.*?href="([^"]+)"[^>]*>([^<]+)</a>'
-    matches1 = re.compile(patron1, re.DOTALL).findall(data)
-    if len(matches1) > 0:
-        for match1 in re.split('<br />|<p>', matches1[0]):
-            if len(match1) > 0:
-                # Extrae las entradas
-                titulo = None
-                scrapedurl = ''
-                matches2 = re.compile(patron2, re.DOTALL).finditer(match1)
-                for match2 in matches2:
-                    if titulo is None:
-                        titulo = match2.group(2)
-                    scrapedurl += match2.group(1) + '#' + match2.group(2) + '|'
-                if titulo is not None:
-                    title = item.title + " " + titulo
-                    itemlist.append(
-                        Item(channel=__channel__,
-                             action="findvideos",
-                             title=title,
-                             url=scrapedurl,
-                             fulltitle=item.fulltitle,
-                             extra=item.extra,
-                             show=item.show))
-
-    return itemlist
-
-
 def findvideos(item):
     if item.extra == 'film':
         return findvid_film(item)
     if item.extra == 'serie':
         return findvid_serie(item)
-    if item.extra == 'anime':
-        return findvid_anime(item)
-
 
 def findvid_film(item):
     logger.info("[cineblog01.py] findvideos")
@@ -811,30 +601,6 @@ def findvid_serie(item):
                  folder=False))
 
     return itemlist
-
-
-def findvid_anime(item):
-    logger.info("[cineblog01.py] findvideos")
-
-    itemlist = []
-
-    for match in item.url.split(r'|'):
-        match_split = match.split(r'#')
-        scrapedurl = match_split[0]
-        if len(scrapedurl) > 0:
-            scrapedtitle = match_split[1]
-            title = item.title + " [COLOR blue][" + scrapedtitle + "][/COLOR]"
-            itemlist.append(
-                Item(channel=__channel__,
-                     action="play",
-                     title=title,
-                     url=scrapedurl,
-                     fulltitle=item.fulltitle,
-                     show=item.show,
-                     folder=False))
-
-    return itemlist
-
 
 def play(item):
     logger.info("[cineblog01.py] play")

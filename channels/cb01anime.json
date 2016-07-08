@@ -1,13 +1,11 @@
 {
     "channel": {
-        "id": "cineblog01",
-        "name": "Cineblog01",
+        "id": "cb01anime",
+        "name": "Cb01anime",
         "active": true,
         "adult": false,
         "category": [
-                     "movie",
-                     "top channels",
-                     "serie",
+                     "anime"
                     ],
         "language": "it",
         "thumbnail": "https://raw.githubusercontent.com/Zanzibar82/images/master/posters/cineblog01.png",
