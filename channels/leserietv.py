@@ -91,6 +91,7 @@ def novita(item):
     scrapertools.printMatches(matches)
 
     for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
+        scrapedthumbnail = host + scrapedthumbnail
         if (DEBUG): logger.info(
             "title=[" + scrapedtitle + "], url=[" + scrapedurl + "], thumbnail=[" + scrapedthumbnail + "]")
         itemlist.append(infoSod(
@@ -138,13 +139,14 @@ def lista_serie(item):
     scrapertools.printMatches(matches)
 
     for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
+        scrapedthumbnail = host + scrapedthumbnail
         logger.info(scrapedurl + " " + scrapedtitle + scrapedthumbnail)
         itemlist.append(infoSod(
             Item(channel=__channel__,
                  action="episodi",
                  title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
                  url=scrapedurl,
-                 thumbnail=host + scrapedthumbnail,
+                 thumbnail=scrapedthumbnail,
                  fulltitle=scrapedtitle,
                  show=scrapedtitle), tipo='tv'))
 
@@ -217,13 +219,14 @@ def search(item, texto):
     scrapertools.printMatches(matches)
 
     for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
+        scrapedthumbnail = host + scrapedthumbnail
         logger.info(scrapedurl + " " + scrapedtitle + scrapedthumbnail)
         itemlist.append(infoSod(
             Item(channel=__channel__,
                  action="episodi",
                  title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
                  url=scrapedurl,
-                 thumbnail=host + scrapedthumbnail,
+                 thumbnail=scrapedthumbnail,
                  fulltitle=scrapedtitle,
                  show=scrapedtitle), tipo='tv'))
 
@@ -244,13 +247,14 @@ def top50(item):
     scrapertools.printMatches(matches)
 
     for scrapedurl, scrapedtitle in matches:
+        scrapedthumbnail = "http://www.leserie.tv/templates/LeserieTv/images/logo.png"
         logger.debug(scrapedurl + " " + scrapedtitle)
         itemlist.append(infoSod(
             Item(channel=__channel__,
                  action="episodi",
                  title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
                  url=scrapedurl,
-                 thumbnail="",
+                 thumbnail=scrapedthumbnail,
                  fulltitle=scrapedtitle,
                  show=scrapedtitle), tipo='tv'))
 
