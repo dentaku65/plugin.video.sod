@@ -5,6 +5,7 @@
 # http://blog.tvalacarta.info/plugin-xbmc/streamondemand.
 # ------------------------------------------------------------
 import re
+import time
 import urllib
 import urlparse
 
@@ -44,20 +45,10 @@ def mainlist(item):
                      url=host,
                      thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
                 Item(channel=__channel__,
-                     title="[COLOR azure]Film HD[/COLOR]",
-                     action="peliculas",
-                     url="%s/category/film-hd/" % host,
-                     thumbnail="http://i.imgur.com/3ED6lOP.png"),
-                Item(channel=__channel__,
                      title="[COLOR azure]Categorie[/COLOR]",
                      action="categorias",
                      url=host,
                      thumbnail="http://xbmc-repo-ackbarr.googlecode.com/svn/trunk/dev/skin.cirrus%20extended%20v2/extras/moviegenres/All%20Movies%20by%20Genre.png"),
-                Item(channel=__channel__,
-                     title="[COLOR azure]Film 3D HD[/COLOR]",
-                     action="peliculas",
-                     url="%s/category/3d/" % host,
-                     thumbnail="http://i.imgur.com/wXMmQie.png"),
                 Item(channel=__channel__,
                      title="[COLOR yellow]Cerca...[/COLOR]",
                      action="search",
@@ -119,7 +110,7 @@ def peliculas(item):
 
     # ------------------------------------------------
     cookies = ""
-    matches = re.compile('(.portalehd.net.*?)\n', re.DOTALL).findall(config.get_cookie_data())
+    matches = re.compile('(.24hd.online.*?)\n', re.DOTALL).findall(config.get_cookie_data())
     for cookie in matches:
         name = cookie.split('\t')[5]
         value = cookie.split('\t')[6]
@@ -129,7 +120,7 @@ def peliculas(item):
     # ------------------------------------------------
 
     # Extrae las entradas (carpetas)
-    patron = 'src="(.*?)" class="attachment-category-thumb[^>]+><a href="([^"]+)" title=[^>]+><b class="title">(.*?)</a>'
+    patron = '<li><img src=".*?src="([^"]+)".*?<a href="([^"]+)".*?class="title">([^<]+)</a>.*?</li>'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for scrapedthumbnail, scrapedurl, scrapedtitle in matches:
@@ -192,6 +183,16 @@ def findvideos(item):
     return itemlist
 
 
+def parseJSString(s):
+    try:
+        offset = 1 if s[0] == '+' else 0
+        val = int(eval(s.replace('!+[]', '1').replace('!![]', '1').replace('[]', '0').replace('(', 'str(')[offset:]))
+        return val
+    except:
+        pass
+
 def HomePage(item):
     import xbmc
     xbmc.executebuiltin("ReplaceWindow(10024,plugin://plugin.video.streamondemand)")
+
+
