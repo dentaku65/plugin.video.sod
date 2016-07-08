@@ -6,6 +6,7 @@
         "adult": false,
         "category": [
                      "movie",
+                     "vos",
                      "top channels"
                     ],
         "language": "it",
