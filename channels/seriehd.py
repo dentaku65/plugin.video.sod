@@ -4,7 +4,10 @@
 # Canal para seriehd - based on guardaserie channel
 # http://blog.tvalacarta.info/plugin-xbmc/streamondemand.
 # ------------------------------------------------------------
+import base64
 import re
+import time
+import urllib
 import urlparse
 
 from core import config
@@ -19,12 +22,15 @@ __type__ = "generic"
 __title__ = "Serie HD"
 __language__ = "IT"
 
-headers = [
-    ['User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0'],
-    ['Accept-Encoding', 'gzip, deflate']
-]
-
 host = "http://www.seriehd.org"
+
+headers = [
+    ['User-Agent', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:44.0) Gecko/20100101 Firefox/44.0'],
+    ['Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'],
+    ['Accept-Encoding', 'gzip, deflate'],
+    ['Referer', host],
+    ['Cache-Control', 'max-age=0']
+]
 
 
 def isGeneric():
@@ -72,7 +78,10 @@ def sottomenu(item):
     logger.info("[seriehd.py] sottomenu")
     itemlist = []
 
-    data = scrapertools.anti_cloudflare(item.url, headers)
+    # data = anti_cloudflare(item.url)
+    data = scrapertools.cache_page(item.url, headers=headers)
+
+    print data
 
     patron = '<a href="([^"]+)">([^<]+)</a>'
 
@@ -205,45 +214,69 @@ def findvideos(item):
     patron = '<iframe id="iframeVid" width=".+?" height=".+?" src="([^"]+)" allowfullscreen="">'
     url = scrapertools.find_single_match(data, patron)
 
-    if 'hdpass.xyz' in url:
+    if 'hdpass' in url:
         data = scrapertools.cache_page(url, headers=headers).replace('\n', '').replace('> <', '><')
 
-        patron = '<form method="get" action="">'
-        patron += '<input type="hidden" name="([^"]*)" value="([^"]*)"/>'
-        patron += '<input type="hidden" name="([^"]*)" value="([^"]*)"/>'
-        patron += '<input type="hidden" name="([^"]*)" value="([^"]*)"/>'
-        patron += '<input type="hidden" name="([^"]*)" value="([^"]*)"/>'
-        patron += '<input type="submit" class="[^"]*" name="([^"]*)" value="([^"]*)"/>'
-        patron += '</form>'
+        # patron = '<form method="get" action="">'
+        # patron += '<input type="hidden" name="([^"]*)" value="([^"]*)"/>'
+        # patron += '<input type="hidden" name="([^"]*)" value="([^"]*)"/>'
+        # patron += '<input type="hidden" name="([^"]*)" value="([^"]*)"/>'
+        # patron += '<input type="hidden" name="([^"]*)" value="([^"]*)"/>'
+        # patron += '<input type="submit" class="[^"]*" name="([^"]*)" value="([^"]*)"/>'
+        # patron += '</form>'
+        #
+        # for name1, val1, name2, val2, name3, val3, name4, val4, name5, val5 in re.compile(patron).findall(data):
+        #
+        #     get_data = '%s=%s&%s=%s&%s=%s&%s=%s&%s=%s' % (
+        #         name1, val1, name2, val2, name3, val3, name4, val4, name5, val5)
+        #
+        #     tmp_data = scrapertools.cache_page('http://hdpass.xyz/film.php?' + get_data, headers=headers)
 
-        for name1, val1, name2, val2, name3, val3, name4, val4, name5, val5 in re.compile(patron).findall(data):
+        patron = r'<input type="hidden" name="urlEmbed" data-mirror="([^"]+)" id="urlEmbed" value="([^"]+)"/>'
 
-            get_data = '%s=%s&%s=%s&%s=%s&%s=%s&%s=%s' % (
-            name1, val1, name2, val2, name3, val3, name4, val4, name5, val5)
+        for media_label, media_url in re.compile(patron).findall(data):
+            media_label = scrapertools.decodeHtmlentities(media_label.replace("hosting", "hdload"))
 
-            tmp_data = scrapertools.cache_page('http://hdpass.xyz/film.php?' + get_data, headers=headers)
-
-            patron = r'<input type="hidden" name="urlEmbed" data-mirror="([^"]+)" id="urlEmbed" value="([^"]+)"/>'
-
-            for media_label, media_url in re.compile(patron).findall(tmp_data):
-                media_label = scrapertools.decodeHtmlentities(media_label.replace("hosting", "hdload"))
-
-                itemlist.append(
-                    Item(channel=__channel__,
-                         server=media_label,
-                         action="play",
-                         title=' - [Player]' if media_label == '' else ' - [Player @%s]' % media_label,
-                         url=media_url,
-                         folder=False))
+            itemlist.append(
+                Item(channel=__channel__,
+                     server=media_label,
+                     action="play",
+                     title=' - [Player]' if media_label == '' else ' - [Player @%s]' % media_label,
+                     url=url_decode(media_url),
+                     folder=False))
 
     return itemlist
 
 
-def unescape(par1, par2, par3):
-    var1 = par1
-    for ii in xrange(0, len(par2)):
-        var1 = re.sub(par2[ii], par3[ii], var1)
+def parseJSString(s):
+    try:
+        offset = 1 if s[0] == '+' else 0
+        val = int(eval(s.replace('!+[]', '1').replace('!![]', '1').replace('[]', '0').replace('(', 'str(')[offset:]))
+        return val
+    except:
+        pass
 
-    var1 = re.sub("%26", "&", var1)
-    var1 = re.sub("%3B", ";", var1)
-    return var1.replace('<!--?--><?', '<!--?-->')
+
+
+def url_decode(url_enc):
+    lenght = len(url_enc)
+    if lenght % 2 == 0:
+        len2 = lenght / 2
+        first = url_enc[0:len2]
+        last = url_enc[len2:lenght]
+        url_enc = last + first
+        reverse = url_enc[::-1]
+        return base64.b64decode(reverse)
+
+    last_car = url_enc[lenght - 1]
+    url_enc[lenght - 1] = ' '
+    url_enc = url_enc.strip()
+    len1 = len(url_enc)
+    len2 = len1 / 2
+    first = url_enc[0:len2]
+    last = url_enc[len2:len1]
+    url_enc = last + first
+    reverse = url_enc[::-1]
+    reverse = reverse + last_car
+    return base64.b64decode(reverse)
+
